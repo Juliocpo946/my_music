@@ -11,13 +11,14 @@ Future<void> main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
     return MaterialApp.router(
-      routerConfig: appRouter,
+      routerConfig: router,
       title: 'My Music',
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,

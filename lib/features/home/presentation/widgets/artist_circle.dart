@@ -16,7 +16,19 @@ class ArtistCircle extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 45,
-            backgroundImage: CachedNetworkImageProvider(artist.pictureMedium),
+            backgroundColor: Colors.grey.shade800,
+            child: ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: artist.pictureMedium,
+                placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator(strokeWidth: 2.0)),
+                errorWidget: (context, url, error) =>
+                const Icon(Icons.person, size: 40),
+                fit: BoxFit.cover,
+                width: 90,
+                height: 90,
+              ),
+            ),
           ),
           const SizedBox(height: 8),
           Text(

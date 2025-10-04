@@ -17,20 +17,20 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
     return await openDatabase(path,
-        version: 4, onCreate: _createDB, onUpgrade: _onUpgradeDB);
+        version: 5, onCreate: _createDB, onUpgrade: _onUpgradeDB);
   }
 
   Future _createDB(Database db, int version) async {
-    await _executeSchema(db);
+    await _executeSchemaV5(db);
   }
 
   Future _onUpgradeDB(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 4) {
-      await _executeSchema(db);
+    if (oldVersion < 5) {
+      await _executeSchemaV5(db);
     }
   }
 
-  Future<void> _executeSchema(Database db) async {
+  Future<void> _executeSchemaV5(Database db) async {
     const textType = 'TEXT NOT NULL';
     const integerType = 'INTEGER NOT NULL';
 
@@ -38,47 +38,30 @@ class DatabaseHelper {
     await db.execute('DROP TABLE IF EXISTS favorite_tracks');
     await db.execute('DROP TABLE IF EXISTS playlists');
     await db.execute('DROP TABLE IF EXISTS playlist_tracks');
+    await db.execute('DROP TABLE IF EXISTS user_settings');
+    await db.execute('DROP TABLE IF EXISTS user_genres');
 
     await db.execute('''
     CREATE TABLE library_tracks ( 
-      id INTEGER PRIMARY KEY, 
-      title $textType,
-      preview $textType,
-      artistId $integerType,
-      artistName $textType,
-      artistPicture $textType,
-      albumId $integerType,
-      albumTitle $textType,
-      albumCover $textType,
-      duration $integerType
+      id INTEGER PRIMARY KEY, title $textType, preview $textType, artistId $integerType, 
+      artistName $textType, artistPicture $textType, albumId $integerType, 
+      albumTitle $textType, albumCover $textType, duration $integerType
       )
     ''');
-
-    await db.execute('''
-    CREATE TABLE favorite_tracks (
-      id INTEGER PRIMARY KEY
-    )
-    ''');
-
-    await db.execute('''
-    CREATE TABLE playlists (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name $textType
-    )
-    ''');
-
+    await db.execute('CREATE TABLE favorite_tracks (id INTEGER PRIMARY KEY)');
+    await db.execute(
+        'CREATE TABLE playlists (id INTEGER PRIMARY KEY AUTOINCREMENT, name $textType)');
     await db.execute('''
     CREATE TABLE playlist_tracks (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      playlist_id INTEGER,
-      track_id INTEGER,
-      title $textType,
-      preview $textType,
-      artistName $textType,
-      albumCover $textType,
-      duration $integerType,
+      id INTEGER PRIMARY KEY AUTOINCREMENT, playlist_id INTEGER, track_id INTEGER, 
+      title $textType, preview $textType, artistName $textType, albumCover $textType, 
+      duration $integerType, 
       FOREIGN KEY (playlist_id) REFERENCES playlists (id) ON DELETE CASCADE
     )
     ''');
+    await db.execute(
+        'CREATE TABLE user_settings (key TEXT PRIMARY KEY, value TEXT)');
+    await db
+        .execute('CREATE TABLE user_genres (name TEXT PRIMARY KEY)');
   }
 }

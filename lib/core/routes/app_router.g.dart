@@ -1,27 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'home_viewmodel.dart';
+part of 'app_router.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$homeViewModelHash() => r'fea714671a29821ae37ae1b62bf539cb66faffdd';
+String _$appRouterHash() => r'a346b6dc92fce49f0ff36f107bc60b9990cc7515';
 
-/// See also [homeViewModel].
-@ProviderFor(homeViewModel)
-final homeViewModelProvider = AutoDisposeFutureProvider<HomeData>.internal(
-  homeViewModel,
-  name: r'homeViewModelProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$homeViewModelHash,
+/// See also [appRouter].
+@ProviderFor(appRouter)
+final appRouterProvider = AutoDisposeProvider<GoRouter>.internal(
+  appRouter,
+  name: r'appRouterProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$appRouterHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef HomeViewModelRef = AutoDisposeFutureProviderRef<HomeData>;
+typedef AppRouterRef = AutoDisposeProviderRef<GoRouter>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
