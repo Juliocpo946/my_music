@@ -1,0 +1,27 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'home_viewmodel.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$homeViewModelHash() => r'3d507b21f0a4185e528304a4afac362f305b8b05';
+
+/// See also [homeViewModel].
+@ProviderFor(homeViewModel)
+final homeViewModelProvider = AutoDisposeFutureProvider<HomeData>.internal(
+  homeViewModel,
+  name: r'homeViewModelProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$homeViewModelHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef HomeViewModelRef = AutoDisposeFutureProviderRef<HomeData>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
