@@ -73,4 +73,12 @@ class PlayerViewModel extends _$PlayerViewModel {
   void seek(Duration position) {
     _audioPlayer.seek(position);
   }
+
+  void nextTrack() {
+    // Lógica para la siguiente canción
+  }
+
+  void previousTrack() {
+    // Lógica para la canción anterior
+  }
 }

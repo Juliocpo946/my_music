@@ -11,13 +11,10 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
 
+    final bool showAppBar = _shouldShowAppBar(location);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_getTitleForLocation(location)),
-        actions: _getActionsForLocation(location),
-        elevation: 0,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      ),
+      appBar: showAppBar ? _buildAppBar(context, location) : null,
       body: Column(
         children: [
           Expanded(child: child),
@@ -31,11 +28,26 @@ class MainShell extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Explorar'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.music_note), label: 'Mi Música'),
+              icon: Icon(Icons.music_note), label: 'Biblioteca'),
           BottomNavigationBarItem(
               icon: Icon(Icons.person_outline), label: 'Perfil'),
         ],
       ),
+    );
+  }
+
+  bool _shouldShowAppBar(String location) {
+    return location.startsWith('/home') ||
+        location.startsWith('/explore') ||
+        location.startsWith('/profile');
+  }
+
+  AppBar _buildAppBar(BuildContext context, String location) {
+    return AppBar(
+      title: Text(_getTitleForLocation(location)),
+      actions: _getActionsForLocation(location),
+      elevation: 0,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     );
   }
 
@@ -49,8 +61,7 @@ class MainShell extends StatelessWidget {
 
   String _getTitleForLocation(String location) {
     if (location.startsWith('/home')) return 'Inicio';
-    if (location.startsWith('/explore')) return 'Explorar';
-    if (location.startsWith('/library')) return 'Mi Música';
+    if (location.startsWith('/explore')) return 'Buscar';
     if (location.startsWith('/profile')) return 'Perfil';
     return '';
   }

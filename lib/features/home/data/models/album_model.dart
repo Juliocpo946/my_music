@@ -10,10 +10,12 @@ class AlbumModel extends Album {
 
   factory AlbumModel.fromJson(Map<String, dynamic> json) {
     return AlbumModel(
-      id: json['id'],
-      title: json['title'],
-      coverMedium: json['cover_medium'],
-      artistName: json['artist']['name'],
+      id: json['id'] ?? 0,
+      title: json['title'] ?? 'Álbum Desconocido',
+      coverMedium: json['cover_medium'] ?? '',
+      artistName: json.containsKey('artist') && json['artist'] is Map
+          ? json['artist']['name'] ?? 'Artista Desconocido'
+          : '',
     );
   }
 }

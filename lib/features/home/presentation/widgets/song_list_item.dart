@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_music/features/player/presentation/viewmodels/player_viewmodel.dart';
+import 'package:my_music/shared/widgets/track_options_menu.dart';
 import '../../domain/entities/track.dart';
 
 class SongListItem extends ConsumerWidget {
@@ -25,6 +26,15 @@ class SongListItem extends ConsumerWidget {
       title: Text(track.title, style: Theme.of(context).textTheme.bodyLarge),
       subtitle: Text(track.artist.name,
           style: Theme.of(context).textTheme.bodyMedium),
+      trailing: IconButton(
+        icon: const Icon(Icons.more_vert),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (_) => TrackOptionsMenu(track: track),
+          );
+        },
+      ),
       onTap: () {
         ref.read(playerViewModelProvider.notifier).playTrack(track);
       },

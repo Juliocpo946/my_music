@@ -18,7 +18,7 @@ class MiniPlayer extends ConsumerWidget {
     }
 
     return GestureDetector(
-      onTap: () => context.go('/player'),
+      onTap: () => context.push('/player'),
       child: Container(
         height: 65,
         decoration: BoxDecoration(
@@ -58,8 +58,8 @@ class MiniPlayer extends ConsumerWidget {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.favorite_border),
-              onPressed: () {},
+              icon: const Icon(Icons.skip_previous),
+              onPressed: playerNotifier.previousTrack,
             ),
             IconButton(
               icon: Icon(
@@ -73,6 +73,10 @@ class MiniPlayer extends ConsumerWidget {
                 }
               },
               iconSize: 32,
+            ),
+            IconButton(
+              icon: const Icon(Icons.skip_next),
+              onPressed: playerNotifier.nextTrack,
             ),
           ],
         ),

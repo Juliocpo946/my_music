@@ -9,9 +9,9 @@ class ArtistModel extends Artist {
 
   factory ArtistModel.fromJson(Map<String, dynamic> json) {
     return ArtistModel(
-      id: json['id'],
-      name: json['name'],
-      pictureMedium: json['picture_medium'],
+      id: json['id'] ?? 0,
+      name: json['name'] ?? 'Artista Desconocido',
+      pictureMedium: json['picture_medium'] ?? '',
     );
   }
 }
