@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../domain/entities/artist.dart';
 
@@ -14,7 +15,7 @@ class ArtistCircle extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundImage: NetworkImage(artist.pictureMedium),
+            backgroundImage: CachedNetworkImageProvider(artist.pictureMedium),
           ),
           const SizedBox(height: 8),
           Text(

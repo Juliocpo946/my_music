@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_music/core/routes/app_router.dart';
 import 'package:my_music/core/utils/app_theme.dart';
-import 'package:my_music/features/home/presentation/pages/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,11 +16,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: appRouter,
       title: 'My Music',
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
     );
   }
 }

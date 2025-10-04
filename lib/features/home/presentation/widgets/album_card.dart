@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../domain/entities/album.dart';
 
@@ -15,8 +16,17 @@ class AlbumCard extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
-            child: Image.network(album.coverMedium,
-                height: 160, width: 160, fit: BoxFit.cover),
+            child: CachedNetworkImage(
+              imageUrl: album.coverMedium,
+              height: 160,
+              width: 160,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Container(
+                color: Colors.grey[850],
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
+            ),
           ),
           const SizedBox(height: 8),
           Text(album.title,
