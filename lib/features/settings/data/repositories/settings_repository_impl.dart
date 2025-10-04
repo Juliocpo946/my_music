@@ -36,4 +36,15 @@ class SettingsRepositoryImpl implements SettingsRepository {
   Future<void> saveUserName(String name) {
     return localDataSource.saveSetting('userName', name);
   }
+
+  @override
+  Future<int?> getAccentColor() async {
+    final colorStr = await localDataSource.getSetting('accentColor');
+    return colorStr != null ? int.tryParse(colorStr) : null;
+  }
+
+  @override
+  Future<void> saveAccentColor(int colorValue) {
+    return localDataSource.saveSetting('accentColor', colorValue.toString());
+  }
 }

@@ -11,6 +11,10 @@ class LibraryRepositoryImpl implements LibraryRepository {
   LibraryRepositoryImpl({required this.localDataSource});
 
   @override
+  Future<void> addTrackToPlaylist(int playlistId, Track track) =>
+      localDataSource.addTrackToPlaylist(playlistId, track);
+
+  @override
   Future<void> addTrackToLibrary(Track track) =>
       localDataSource.addTrackToLibrary(track);
 
@@ -55,4 +59,8 @@ class LibraryRepositoryImpl implements LibraryRepository {
   @override
   Future<void> createPlaylist(String name) =>
       localDataSource.createPlaylist(name);
+
+  @override
+  Future<void> deletePlaylist(int playlistId) =>
+      localDataSource.deletePlaylist(playlistId);
 }

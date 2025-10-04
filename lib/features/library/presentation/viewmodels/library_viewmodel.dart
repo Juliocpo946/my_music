@@ -36,6 +36,11 @@ class LibraryViewModel extends _$LibraryViewModel {
     );
   }
 
+  Future<void> addTrackToPlaylist(int playlistId, Track track) async {
+    await _repository.addTrackToPlaylist(playlistId, track);
+    ref.invalidateSelf();
+  }
+
   Future<void> addTrackToLibrary(Track track) async {
     await _repository.addTrackToLibrary(track);
     ref.invalidateSelf();
@@ -74,6 +79,11 @@ class LibraryViewModel extends _$LibraryViewModel {
   Future<void> createPlaylist(String name) async {
     if (name.trim().isEmpty) return;
     await _repository.createPlaylist(name);
+    ref.invalidateSelf();
+  }
+
+  Future<void> deletePlaylist(int playlistId) async {
+    await _repository.deletePlaylist(playlistId);
     ref.invalidateSelf();
   }
 }

@@ -2,18 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_music/features/album_details/presentation/pages/album_details_page.dart';
 import 'package:my_music/features/artist_details/presentation/pages/artist_details_page.dart';
+import 'package:my_music/features/genre_details/presentation/pages/genre_details_page.dart';
 import 'package:my_music/features/home/presentation/pages/home_page.dart';
 import 'package:my_music/features/library/presentation/pages/library_page.dart';
 import 'package:my_music/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:my_music/features/player/presentation/pages/player_page.dart';
+import 'package:my_music/features/profile/presentation/pages/edit_genres_page.dart';
+import 'package:my_music/features/profile/presentation/pages/profile_page.dart';
+import 'package:my_music/features/recommendations/presentation/pages/recommendations_page.dart';
 import 'package:my_music/features/search/presentation/pages/search_page.dart';
 import 'package:my_music/shared/widgets/main_shell.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../features/playlist_details/presentation/pages/playlist_details_page.dart';
 import '../providers/settings_provider.dart';
 
 part 'app_router.g.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 @riverpod
 GoRouter appRouter(AppRouterRef ref) {
@@ -45,6 +51,7 @@ GoRouter appRouter(AppRouterRef ref) {
         },
         branches: [
           StatefulShellBranch(
+            navigatorKey: _shellNavigatorKey,
             routes: [
               GoRoute(
                 path: '/home',
@@ -53,7 +60,6 @@ GoRouter appRouter(AppRouterRef ref) {
                 routes: [
                   GoRoute(
                     path: 'album/:id',
-                    parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
                       final albumId = int.parse(state.pathParameters['id']!);
                       return AlbumDetailsPage(albumId: albumId);
@@ -61,11 +67,23 @@ GoRouter appRouter(AppRouterRef ref) {
                   ),
                   GoRoute(
                     path: 'artist/:id',
-                    parentNavigatorKey: _rootNavigatorKey,
                     builder: (context, state) {
                       final artistId =
                       int.parse(state.pathParameters['id']!);
                       return ArtistDetailsPage(artistId: artistId);
+                    },
+                  ),
+                  GoRoute(
+                    path: 'recommendations',
+                    builder: (context, state) {
+                      return const RecommendationsPage();
+                    },
+                  ),
+                  GoRoute(
+                    path: 'genre/:name',
+                    builder: (context, state) {
+                      final genreName = state.pathParameters['name']!;
+                      return GenreDetailsPage(genreName: genreName);
                     },
                   ),
                 ],
@@ -87,16 +105,31 @@ GoRouter appRouter(AppRouterRef ref) {
                 path: '/library',
                 pageBuilder: (context, state) =>
                 const NoTransitionPage(child: LibraryPage()),
+                routes: [
+                  GoRoute(
+                    path: 'playlist/:id',
+                    builder: (context, state) {
+                      final playlistId = int.parse(state.pathParameters['id']!);
+                      return PlaylistDetailsPage(playlistId: playlistId);
+                    },
+                  ),
+                ],
               ),
             ],
           ),
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/profile',
-                pageBuilder: (context, state) => const NoTransitionPage(
-                  child: Center(child: Text('Página de Perfil')),
-                ),
+                  path: '/profile',
+                  pageBuilder: (context, state) => const NoTransitionPage(
+                    child: ProfilePage(),
+                  ),
+                  routes: [
+                    GoRoute(
+                      path: 'edit-genres',
+                      builder: (context, state) => const EditGenresPage(),
+                    )
+                  ]
               ),
             ],
           ),

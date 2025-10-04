@@ -12,7 +12,11 @@ class MainShell extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Expanded(child: navigationShell),
+          Expanded(
+            child: SafeArea(
+              child: navigationShell,
+            ),
+          ),
           const MiniPlayer(),
         ],
       ),

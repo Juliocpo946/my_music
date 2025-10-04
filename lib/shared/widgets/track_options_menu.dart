@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_music/features/home/domain/entities/track.dart';
 import 'package:my_music/features/library/presentation/viewmodels/library_viewmodel.dart';
+import 'package:my_music/shared/widgets/add_to_playlist_dialog.dart';
 
 class TrackOptionsMenu extends ConsumerWidget {
   final Track track;
@@ -27,8 +28,9 @@ class TrackOptionsMenu extends ConsumerWidget {
           builder: (context, snapshot) {
             final isInLibrary = snapshot.data ?? false;
             return ListTile(
-              leading: Icon(
-                  isInLibrary ? Icons.remove_circle_outline : Icons.add_circle_outline),
+              leading: Icon(isInLibrary
+                  ? Icons.remove_circle_outline
+                  : Icons.add_circle_outline),
               title: Text(
                   isInLibrary ? 'Quitar de Canciones' : 'Agregar a Canciones'),
               onTap: () {
@@ -43,10 +45,14 @@ class TrackOptionsMenu extends ConsumerWidget {
           },
         ),
         ListTile(
-          leading: const Icon(Icons.delete_outline),
-          title: const Text('Eliminar'),
+          leading: const Icon(Icons.playlist_add),
+          title: const Text('Agregar a playlist'),
           onTap: () {
             Navigator.pop(context);
+            showModalBottomSheet(
+              context: context,
+              builder: (_) => AddToPlaylistDialog(track: track),
+            );
           },
         ),
         ListTile(
@@ -56,45 +62,6 @@ class TrackOptionsMenu extends ConsumerWidget {
             Navigator.pop(context);
           },
         ),
-        ListTile(
-          leading: const Icon(Icons.info_outline),
-          title: const Text('Información de la canción'),
-          onTap: () {
-            Navigator.pop(context);
-            showDialog(
-              context: context,
-              builder: (_) => TrackInfoDialog(track: track),
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class TrackInfoDialog extends StatelessWidget {
-  final Track track;
-  const TrackInfoDialog({super.key, required this.track});
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Información'),
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Canción: ${track.title}'),
-          Text('Artista: ${track.artist.name}'),
-          Text('Álbum: ${track.albumTitle}'),
-          Text('Duración: ${track.duration} segundos'),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cerrar'),
-        )
       ],
     );
   }

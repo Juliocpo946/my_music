@@ -19,4 +19,6 @@ abstract class LibraryRepository {
   Future<List<Album>> getLibraryAlbums();
   Future<List<Artist>> getLibraryArtists();
   Future<void> createPlaylist(String name);
+  Future<void> addTrackToPlaylist(int playlistId, Track track);
+  Future<void> deletePlaylist(int playlistId);
 }

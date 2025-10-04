@@ -5,4 +5,6 @@ abstract class SettingsRepository {
   Future<List<String>> getGenres();
   Future<void> completeOnboarding();
   Future<bool> isOnboardingComplete();
+  Future<void> saveAccentColor(int colorValue);
+  Future<int?> getAccentColor();
 }

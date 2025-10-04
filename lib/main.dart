@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_music/core/routes/app_router.dart';
-import 'package:my_music/core/utils/app_theme.dart';
+import 'package:my_music/core/theme/theme_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,10 +17,12 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
+    final theme = ref.watch(appThemeProvider);
+
     return MaterialApp.router(
       routerConfig: router,
       title: 'My Music',
-      theme: AppTheme.darkTheme,
+      theme: theme,
       debugShowCheckedModeBanner: false,
     );
   }

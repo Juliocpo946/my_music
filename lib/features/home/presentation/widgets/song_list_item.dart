@@ -11,7 +11,17 @@ class SongListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final playerState = ref.watch(playerViewModelProvider);
+    final isPlayingThisTrack =
+        playerState.isPlaying && playerState.currentTrack?.id == track.id;
+
     return ListTile(
+      tileColor: isPlayingThisTrack
+          ? Theme.of(context).primaryColor.withOpacity(0.25)
+          : null,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(4.0),
         child: CachedNetworkImage(
@@ -24,8 +34,8 @@ class SongListItem extends ConsumerWidget {
         ),
       ),
       title: Text(track.title, style: Theme.of(context).textTheme.bodyLarge),
-      subtitle: Text(track.artist.name,
-          style: Theme.of(context).textTheme.bodyMedium),
+      subtitle:
+      Text(track.artist.name, style: Theme.of(context).textTheme.bodyMedium),
       trailing: IconButton(
         icon: const Icon(Icons.more_vert),
         onPressed: () {

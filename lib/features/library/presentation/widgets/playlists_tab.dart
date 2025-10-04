@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../viewmodels/library_viewmodel.dart';
 
 class PlaylistsTab extends ConsumerWidget {
@@ -15,9 +16,8 @@ class PlaylistsTab extends ConsumerWidget {
       error: (err, stack) => Center(child: Text('Error: $err')),
       data: (data) {
         final filteredPlaylists = data.playlists
-            .where((playlist) => playlist.name
-            .toLowerCase()
-            .contains(searchQuery.toLowerCase()))
+            .where((playlist) =>
+            playlist.name.toLowerCase().contains(searchQuery.toLowerCase()))
             .toList();
 
         if (filteredPlaylists.isEmpty) {
@@ -40,9 +40,35 @@ class PlaylistsTab extends ConsumerWidget {
               ),
               title: Text(playlist.name),
               subtitle: Text('Playlist • ${playlist.trackCount} canciones'),
+              onTap: () => context.push('/library/playlist/${playlist.id}'),
               trailing: IconButton(
                 icon: const Icon(Icons.more_vert),
-                onPressed: () {},
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (_) => Wrap(
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.share),
+                          title: const Text('Compartir'),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.delete_outline),
+                          title: const Text('Eliminar playlist'),
+                          onTap: () {
+                            Navigator.pop(context);
+                            ref
+                                .read(libraryViewModelProvider.notifier)
+                                .deletePlaylist(playlist.id);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             );
           },

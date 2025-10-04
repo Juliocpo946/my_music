@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:my_music/features/home/domain/entities/album.dart';
 import '../viewmodels/home_viewmodel.dart';
 import '../widgets/album_card.dart';
@@ -80,7 +81,7 @@ class HomePage extends ConsumerWidget {
                 ),
                 Center(
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () => context.push('/home/recommendations'),
                     child: const Text('Descubrir más'),
                   ),
                 ),

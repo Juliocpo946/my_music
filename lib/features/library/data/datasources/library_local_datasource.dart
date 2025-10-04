@@ -23,10 +23,30 @@ abstract class LibraryLocalDataSource {
   Future<List<AlbumModel>> getLibraryAlbums();
   Future<List<ArtistModel>> getLibraryArtists();
   Future<void> createPlaylist(String name);
+  Future<void> addTrackToPlaylist(int playlistId, Track track);
+  Future<void> deletePlaylist(int playlistId);
 }
 
 class LibraryLocalDataSourceImpl implements LibraryLocalDataSource {
   final dbHelper = DatabaseHelper.instance;
+
+  @override
+  Future<void> addTrackToPlaylist(int playlistId, Track track) async {
+    final db = await dbHelper.database;
+    await db.insert(
+      'playlist_tracks',
+      {
+        'playlist_id': playlistId,
+        'track_id': track.id,
+        'title': track.title,
+        'preview': track.preview,
+        'artistName': track.artist.name,
+        'albumCover': track.albumCover,
+        'duration': track.duration,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
 
   @override
   Future<void> addTrackToLibrary(Track track) async {
@@ -103,8 +123,8 @@ class LibraryLocalDataSourceImpl implements LibraryLocalDataSource {
   @override
   Future<bool> isFavorite(int trackId) async {
     final db = await dbHelper.database;
-    final maps = await db
-        .query('favorite_tracks', where: 'id = ?', whereArgs: [trackId]);
+    final maps =
+    await db.query('favorite_tracks', where: 'id = ?', whereArgs: [trackId]);
     return maps.isNotEmpty;
   }
 
@@ -164,5 +184,11 @@ class LibraryLocalDataSourceImpl implements LibraryLocalDataSource {
   Future<void> createPlaylist(String name) async {
     final db = await dbHelper.database;
     await db.insert('playlists', {'name': name});
+  }
+
+  @override
+  Future<void> deletePlaylist(int playlistId) async {
+    final db = await dbHelper.database;
+    await db.delete('playlists', where: 'id = ?', whereArgs: [playlistId]);
   }
 }
