@@ -36,7 +36,7 @@ class PlayerPage extends ConsumerWidget {
               style: Theme.of(context)
                   .textTheme
                   .labelSmall
-                  ?.copyWith(color: Colors.white.withOpacity(0.7)),
+                  ?.copyWith(color: Colors.white.withAlpha(178)),
             ),
             Text(track.title, style: Theme.of(context).textTheme.bodyMedium),
           ],
@@ -63,7 +63,7 @@ class PlayerPage extends ConsumerWidget {
             ),
           ),
           Container(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withAlpha(128),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0)
@@ -116,7 +116,7 @@ class PlayerPage extends ConsumerWidget {
                       progress: playerState.position,
                       total: playerState.duration,
                       onSeek: playerNotifier.seek,
-                      baseBarColor: Colors.white.withOpacity(0.3),
+                      baseBarColor: Colors.white.withAlpha(77),
                       progressBarColor: Colors.white,
                       thumbColor: Colors.white,
                       timeLabelTextStyle:

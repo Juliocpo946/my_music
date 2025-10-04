@@ -24,7 +24,7 @@ class MiniPlayer extends ConsumerWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF2A2A2A),
           border: Border(
-            top: BorderSide(color: Colors.black.withOpacity(0.5), width: 1),
+            top: BorderSide(color: Colors.black.withAlpha(128), width: 1),
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8.0),

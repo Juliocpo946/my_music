@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package.just_audio/just_audio.dart';
+import 'package:just_audio/just_audio.dart' hide PlayerState;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:my_music/features/home/domain/entities/track.dart';
 import 'package:my_music/features/player/domain/entities/player_state.dart';
