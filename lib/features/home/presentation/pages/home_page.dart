@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../shared/widgets/section_header.dart';
+import '../../../../shared/widgets/genre_chip.dart';
 import '../viewmodels/home_viewmodel.dart';
 import '../widgets/album_card.dart';
 import '../widgets/artist_circle.dart';
-import '../widgets/genre_chip.dart';
-import '../widgets/section_header.dart';
 import '../widgets/song_list_item.dart';
 
 class HomePage extends ConsumerWidget {
