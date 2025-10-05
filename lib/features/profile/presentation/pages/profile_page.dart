@@ -9,6 +9,8 @@ import 'package:my_music/features/settings/domain/repositories/settings_reposito
 class ProfilePage extends ConsumerWidget {
   const ProfilePage({super.key});
 
+  Color? get accentColor => null;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsRepositoryProvider);
@@ -53,7 +55,7 @@ class ProfilePage extends ConsumerWidget {
             onTap: () {},
           ),
           ListTile(
-            leading: const Icon(Icons.power),
+            leading: const Icon(Icons.favorite, color: Colors.deepPurple),
             title: const Text('Powered by Deezer'),
             onTap: () {},
           ),
