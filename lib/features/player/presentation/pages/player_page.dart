@@ -72,7 +72,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
         width: MediaQuery.of(context).size.width - 48,
         height: MediaQuery.of(context).size.width - 48,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(16),
         ),
         child: lyricsAsync.when(
@@ -142,7 +142,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
               ),
             ),
           if (_showAlbumArt && !_showLyrics)
-            Container(color: Colors.black.withOpacity(0.5)),
+            Container(color: Colors.black.withValues(alpha: 0.5)),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),

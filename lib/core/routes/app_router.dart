@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_music/features/album_details/presentation/pages/album_details_page.dart';
 import 'package:my_music/features/artist_details/presentation/pages/artist_details_page.dart';
@@ -22,7 +23,7 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 @riverpod
-GoRouter appRouter(AppRouterRef ref) {
+GoRouter appRouter(Ref ref) {
   final settingsRepository = ref.watch(settingsRepositoryProvider);
 
   return GoRouter(

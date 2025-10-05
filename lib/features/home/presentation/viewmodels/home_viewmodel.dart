@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_music/core/providers/settings_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../core/providers/dio_provider.dart';
@@ -12,7 +13,7 @@ import '../../domain/usecases/get_home_data.dart';
 part 'home_viewmodel.g.dart';
 
 @riverpod
-Future<HomeData> homeViewModel(HomeViewModelRef ref) async {
+Future<HomeData> homeViewModel(Ref ref) async {
   final dio = ref.watch(dioProvider);
   final settingsRepository = ref.watch(settingsRepositoryProvider);
 

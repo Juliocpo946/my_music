@@ -1,10 +1,11 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'lyrics_provider.g.dart';
 
 @riverpod
-Future<String> lyrics(LyricsRef ref,
+Future<String> lyrics(Ref ref,
     {required String artist, required String track}) async {
   final dio = Dio();
   final url = 'https://api.lyrics.ovh/v1/$artist/$track';

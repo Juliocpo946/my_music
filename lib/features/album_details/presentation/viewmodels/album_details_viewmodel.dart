@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:my_music/core/providers/dio_provider.dart';
 import '../../data/datasources/album_details_remote_datasource.dart';
@@ -9,7 +10,7 @@ part 'album_details_viewmodel.g.dart';
 
 @riverpod
 Future<AlbumDetails> albumDetailsViewModel(
-    AlbumDetailsViewModelRef ref, int albumId) async {
+    Ref ref, int albumId) async {
   final dio = ref.watch(dioProvider);
   final dataSource = AlbumDetailsRemoteDataSourceImpl(dio: dio);
   final repository = AlbumDetailsRepositoryImpl(remoteDataSource: dataSource);

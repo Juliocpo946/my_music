@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_music/core/providers/settings_provider.dart';
 import 'package:my_music/core/utils/app_colors.dart';
 import 'package:my_music/core/utils/app_theme.dart';
@@ -20,13 +21,13 @@ class AccentColorNotifier extends _$AccentColorNotifier {
 
   Future<void> updateColor(Color color) async {
     final repository = ref.read(settingsRepositoryProvider);
-    await repository.saveAccentColor(color.value);
+    await repository.saveAccentColor(color.toARGB32());
     state = AsyncValue.data(color);
   }
 }
 
 @riverpod
-ThemeData appTheme(AppThemeRef ref) {
+ThemeData appTheme(Ref ref) {
   final accentColor = ref.watch(accentColorNotifierProvider);
   return AppTheme.darkTheme(accentColor.value ?? AppColors.electricBlue);
 }

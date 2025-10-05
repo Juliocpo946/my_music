@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:my_music/core/providers/dio_provider.dart';
 import 'package:my_music/core/providers/settings_provider.dart';
@@ -9,7 +10,7 @@ import 'package:my_music/features/recommendations/domain/usecases/get_album_reco
 part 'recommendations_viewmodel.g.dart';
 
 @riverpod
-Future<List<Album>> recommendationsViewModel(RecommendationsViewModelRef ref) {
+Future<List<Album>> recommendationsViewModel(Ref ref) {
   final dio = ref.watch(dioProvider);
   final settingsRepository = ref.watch(settingsRepositoryProvider);
 

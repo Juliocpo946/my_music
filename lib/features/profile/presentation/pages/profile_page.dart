@@ -130,7 +130,7 @@ class ProfilePage extends ConsumerWidget {
                   Navigator.of(context).pop();
                 },
               );
-            }).toList(),
+            }),
           ],
         );
       },

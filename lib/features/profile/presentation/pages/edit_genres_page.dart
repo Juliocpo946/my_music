@@ -26,7 +26,8 @@ class _EditGenresPageState extends ConsumerState<EditGenresPage> {
           TextButton(
             onPressed: () async {
               await settingsRepo.saveGenres(_selectedGenres.toList());
-              if (mounted) Navigator.of(context).pop();
+              if (!context.mounted) return;
+              Navigator.of(context).pop();
             },
             child: const Text('Guardar'),
           )

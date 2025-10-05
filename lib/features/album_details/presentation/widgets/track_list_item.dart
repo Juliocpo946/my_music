@@ -47,7 +47,7 @@ class TrackListItem extends ConsumerWidget {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 4),
       tileColor: isPlayingThisTrack
-          ? Theme.of(context).primaryColor.withOpacity(0.25)
+          ? Theme.of(context).primaryColor.withValues(alpha: 0.25)
           : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),

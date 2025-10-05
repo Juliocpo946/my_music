@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:my_music/core/providers/dio_provider.dart';
 import 'package:my_music/features/genre_details/data/datasources/genre_details_remote_datasource.dart';
@@ -9,7 +10,7 @@ part 'genre_details_viewmodel.g.dart';
 
 @riverpod
 Future<GenreDetailsData> genreDetailsViewModel(
-    GenreDetailsViewModelRef ref,
+    Ref ref,
     String genreName,
     ) async {
   final dio = ref.watch(dioProvider);
