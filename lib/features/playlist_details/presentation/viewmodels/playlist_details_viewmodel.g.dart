@@ -7,7 +7,7 @@ part of 'playlist_details_viewmodel.dart';
 // **************************************************************************
 
 String _$playlistDetailsViewModelHash() =>
-    r'35551e1a96647f09ec61d591a9532757a45db71c';
+    r'95397051111b6239f33d1fd9192b790eacbc83fd';
 
 /// Copied from Dart SDK
 class _SystemHash {

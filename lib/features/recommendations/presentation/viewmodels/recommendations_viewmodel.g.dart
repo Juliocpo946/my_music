@@ -7,7 +7,7 @@ part of 'recommendations_viewmodel.dart';
 // **************************************************************************
 
 String _$recommendationsViewModelHash() =>
-    r'c52ad0280c4e663607de8b007b3dab1c70ef0171';
+    r'c39d627c842d3d6208eea2e6bfbb5c2693d68025';
 
 /// See also [recommendationsViewModel].
 @ProviderFor(recommendationsViewModel)

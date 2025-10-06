@@ -7,7 +7,7 @@ part of 'artist_details_viewmodel.dart';
 // **************************************************************************
 
 String _$artistDetailsViewModelHash() =>
-    r'741110a69e186c052023a6f6a92d827603cb1fb6';
+    r'eb5e5605a2bf020554a18bd16b514759987951fe';
 
 /// Copied from Dart SDK
 class _SystemHash {

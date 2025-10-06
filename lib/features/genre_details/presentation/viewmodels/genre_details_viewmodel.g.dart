@@ -7,7 +7,7 @@ part of 'genre_details_viewmodel.dart';
 // **************************************************************************
 
 String _$genreDetailsViewModelHash() =>
-    r'702a7323220bc9f7d1198365419e7380ef2c4cc2';
+    r'6ca8367abbc9dd68a87d59f5ee35e2c3c12eff32';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -7,7 +7,7 @@ part of 'album_details_viewmodel.dart';
 // **************************************************************************
 
 String _$albumDetailsViewModelHash() =>
-    r'de1c7f9eb2a2024d05f6a6ebcfcdd96675dce792';
+    r'eb155dad4c493ca11f49b2b75e808d74125546e4';
 
 /// Copied from Dart SDK
 class _SystemHash {

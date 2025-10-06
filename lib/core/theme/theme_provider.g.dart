@@ -6,7 +6,7 @@ part of 'theme_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appThemeHash() => r'06783ae11048fec8eb3f2f5848ed61a03a23a96a';
+String _$appThemeHash() => r'3da9f046c13e1e800b892b087be81c62bbdcfcc4';
 
 /// See also [appTheme].
 @ProviderFor(appTheme)
@@ -23,7 +23,7 @@ final appThemeProvider = AutoDisposeProvider<ThemeData>.internal(
 // ignore: unused_element
 typedef AppThemeRef = AutoDisposeProviderRef<ThemeData>;
 String _$accentColorNotifierHash() =>
-    r'1e6593a91893fc9454fbdc87c97270edada9153d';
+    r'93cad485e3335f48fe48be0627ba946d3b365fdc';
 
 /// See also [AccentColorNotifier].
 @ProviderFor(AccentColorNotifier)
