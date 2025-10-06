@@ -1,6 +1,11 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:my_music/features/home/domain/entities/artist.dart';
+import 'package:my_music/features/library/domain/services/metadata_service.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:my_music/features/home/domain/entities/album.dart';
-import 'package:my_music/features/home/domain/entities/artist.dart';
 import 'package:my_music/features/home/domain/entities/track.dart';
 import 'package:my_music/features/library/domain/entities/playlist.dart';
 import '../../data/datasources/library_local_datasource.dart';
@@ -13,10 +18,12 @@ part 'library_viewmodel.g.dart';
 class LibraryViewModel extends _$LibraryViewModel {
   final LibraryRepositoryImpl _repository =
   LibraryRepositoryImpl(localDataSource: LibraryLocalDataSourceImpl());
+  final MetadataService _metadataService = MetadataService();
 
   @override
   Future<LibraryState> build() async {
-    return await _loadData();
+    final initialState = await _loadData();
+    return _sortAllData(initialState);
   }
 
   Future<LibraryState> _loadData() async {
@@ -34,6 +41,97 @@ class LibraryViewModel extends _$LibraryViewModel {
       libraryAlbums: results[3] as List<Album>,
       libraryArtists: results[4] as List<Artist>,
     );
+  }
+
+  Future<void> scanLocalFiles() async {
+    var status = await Permission.audio.request();
+    if (!status.isGranted) {
+      status = await Permission.storage.request();
+    }
+
+    if (status.isGranted) {
+      state = AsyncData(state.value!.copyWith(isScanning: true));
+
+      final List<Map<dynamic, dynamic>> nativeSongs = await _metadataService.scanLocalSongs();
+      if (nativeSongs.isNotEmpty) {
+        await _repository.clearLocalSongs();
+      }
+
+      final List<Track> foundTracks = [];
+      for (var songMap in nativeSongs) {
+        final filePath = songMap['filePath'] as String?;
+        if (filePath == null) continue;
+
+        foundTracks.add(Track(
+          id: (songMap['id'] as int?)?.toInt() ?? filePath.hashCode,
+          title: songMap['title'] ?? filePath.split('/').last,
+          artist: Artist(
+            id: (songMap['artist'] as String? ?? 'Artista Desconocido').hashCode,
+            name: songMap['artist'] ?? 'Artista Desconocido',
+            pictureMedium: '',
+          ),
+          albumId: (songMap['album'] as String? ?? 'Álbum Desconocido').hashCode,
+          albumTitle: songMap['album'] ?? 'Álbum Desconocido',
+          albumCover: '',
+          duration: (songMap['duration'] as int?) ?? 0,
+          preview: filePath,
+          isLocal: true,
+          filePath: filePath,
+        ));
+      }
+
+      if (foundTracks.isNotEmpty) {
+        await _repository.addMultipleTracksToLibrary(foundTracks);
+      }
+
+      ref.invalidateSelf();
+      await future;
+      state = AsyncData(state.value!.copyWith(isScanning: false));
+    }
+  }
+
+  void sortTracks(TrackSortBy sortBy, SortOrder sortOrder) {
+    if (state.value == null) return;
+    state = AsyncData(_sortAllData(
+        state.value!.copyWith(trackSortBy: sortBy, trackSortOrder: sortOrder)));
+  }
+
+  void sortAlbums(AlbumSortBy sortBy, SortOrder sortOrder) {
+    if (state.value == null) return;
+    state = AsyncData(_sortAllData(
+        state.value!.copyWith(albumSortBy: sortBy, albumSortOrder: sortOrder)));
+  }
+
+  LibraryState _sortAllData(LibraryState currentState) {
+    final tracks = List<Track>.from(currentState.libraryTracks);
+    final albums = List<Album>.from(currentState.libraryAlbums);
+
+    tracks.sort((a, b) {
+      int comparison;
+      if (currentState.trackSortBy == TrackSortBy.name) {
+        comparison = a.title.toLowerCase().compareTo(b.title.toLowerCase());
+      } else {
+        comparison = b.id.compareTo(a.id);
+      }
+      return currentState.trackSortOrder == SortOrder.asc
+          ? comparison
+          : -comparison;
+    });
+
+    albums.sort((a, b) {
+      int comparison;
+      if (currentState.albumSortBy == AlbumSortBy.albumName) {
+        comparison = a.title.toLowerCase().compareTo(b.title.toLowerCase());
+      } else {
+        comparison =
+            a.artistName.toLowerCase().compareTo(b.artistName.toLowerCase());
+      }
+      return currentState.albumSortOrder == SortOrder.asc
+          ? comparison
+          : -comparison;
+    });
+
+    return currentState.copyWith(libraryTracks: tracks, libraryAlbums: albums);
   }
 
   Future<void> addTrackToPlaylist(int playlistId, Track track) async {
@@ -58,7 +156,9 @@ class LibraryViewModel extends _$LibraryViewModel {
   }
 
   Future<void> addFavorite(Track track) async {
-    await _repository.addTrackToLibrary(track);
+    if (!track.isLocal) {
+      await _repository.addTrackToLibrary(track);
+    }
     await _repository.addFavorite(track.id);
     ref.invalidateSelf();
   }

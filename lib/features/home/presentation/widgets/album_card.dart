@@ -10,7 +10,14 @@ class AlbumCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/home/album/${album.id}'),
+      onTap: () {
+        if (album.id != 0 && album.id.toString().length > 5) {
+          context.push('/home/album/${album.id}');
+        } else if (album.id != 0) {
+          final encodedTitle = Uri.encodeComponent(album.title);
+          context.push('/library/local-album/${album.id}/$encodedTitle');
+        }
+      },
       child: Container(
         width: 160,
         margin: const EdgeInsets.only(right: 16),
@@ -19,16 +26,29 @@ class AlbumCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child: CachedNetworkImage(
+              child: album.coverMedium.isNotEmpty
+                  ? CachedNetworkImage(
                 imageUrl: album.coverMedium,
                 height: 160,
                 width: 160,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Container(
+                  height: 160,
+                  width: 160,
                   color: Colors.grey[850],
-                  child: const Center(child: CircularProgressIndicator()),
                 ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+                errorWidget: (context, url, error) =>
+                const Icon(Icons.error),
+              )
+                  : Container(
+                height: 160,
+                width: 160,
+                color: Theme.of(context).primaryColor.withOpacity(0.3),
+                child: const Icon(
+                  Icons.music_note,
+                  color: Colors.white,
+                  size: 60,
+                ),
               ),
             ),
             const SizedBox(height: 8),

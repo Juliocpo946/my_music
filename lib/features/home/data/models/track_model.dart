@@ -11,6 +11,9 @@ class TrackModel extends Track {
     required super.albumTitle,
     required super.albumCover,
     required super.duration,
+    super.isLocal,
+    super.filePath,
+    super.embeddedPicture,
   });
 
   factory TrackModel.fromJson(Map<String, dynamic> json) {

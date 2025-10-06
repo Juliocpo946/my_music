@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/albums_tab.dart';
 import '../widgets/artists_tab.dart';
 import '../widgets/favorite_songs_tab.dart';
+import '../widgets/folders_tab.dart';
 import '../widgets/library_songs_tab.dart';
 import '../widgets/playlists_tab.dart';
 import '../viewmodels/library_viewmodel.dart';
@@ -25,7 +26,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
   }
 
   @override
@@ -74,6 +75,8 @@ class _LibraryPageState extends ConsumerState<LibraryPage>
 
   @override
   Widget build(BuildContext context) {
+    final libraryState = ref.watch(libraryViewModelProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: _isSearching
@@ -94,6 +97,24 @@ class _LibraryPageState extends ConsumerState<LibraryPage>
         )
             : const Text('Mi Biblioteca'),
         actions: [
+          libraryState.when(
+            data: (data) => data.isScanning
+                ? const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+                : IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () {
+                ref.read(libraryViewModelProvider.notifier).scanLocalFiles();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Escaneando archivos locales...')),
+                );
+              },
+            ),
+            loading: () => const SizedBox.shrink(),
+            error: (e, s) => const Icon(Icons.error),
+          ),
           IconButton(
             onPressed: () {
               setState(() {
@@ -112,10 +133,11 @@ class _LibraryPageState extends ConsumerState<LibraryPage>
           isScrollable: true,
           tabs: const [
             Tab(text: 'Canciones'),
-            Tab(text: 'Canciones Favoritas'),
+            Tab(text: 'Favoritas'),
             Tab(text: 'Playlists'),
             Tab(text: 'Álbumes'),
             Tab(text: 'Artistas'),
+            Tab(text: 'Carpetas'),
           ],
         ),
       ),
@@ -127,6 +149,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage>
           PlaylistsTab(searchQuery: _searchQuery),
           AlbumsTab(searchQuery: _searchQuery),
           ArtistsTab(searchQuery: _searchQuery),
+          FoldersTab(searchQuery: _searchQuery),
         ],
       ),
       floatingActionButton: FloatingActionButton(

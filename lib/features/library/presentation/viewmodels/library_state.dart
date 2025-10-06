@@ -4,12 +4,21 @@ import 'package:my_music/features/home/domain/entities/artist.dart';
 import 'package:my_music/features/home/domain/entities/track.dart';
 import 'package:my_music/features/library/domain/entities/playlist.dart';
 
+enum SortOrder { asc, desc }
+enum TrackSortBy { name, dateAdded }
+enum AlbumSortBy { albumName, artistName }
+
 class LibraryState extends Equatable {
   final List<Playlist> playlists;
   final List<Track> libraryTracks;
   final List<int> favoriteTrackIds;
   final List<Album> libraryAlbums;
   final List<Artist> libraryArtists;
+  final bool isScanning;
+  final TrackSortBy trackSortBy;
+  final AlbumSortBy albumSortBy;
+  final SortOrder trackSortOrder;
+  final SortOrder albumSortOrder;
 
   const LibraryState({
     this.playlists = const [],
@@ -17,6 +26,11 @@ class LibraryState extends Equatable {
     this.favoriteTrackIds = const [],
     this.libraryAlbums = const [],
     this.libraryArtists = const [],
+    this.isScanning = false,
+    this.trackSortBy = TrackSortBy.dateAdded,
+    this.albumSortBy = AlbumSortBy.albumName,
+    this.trackSortOrder = SortOrder.asc,
+    this.albumSortOrder = SortOrder.asc,
   });
 
   LibraryState copyWith({
@@ -25,6 +39,11 @@ class LibraryState extends Equatable {
     List<int>? favoriteTrackIds,
     List<Album>? libraryAlbums,
     List<Artist>? libraryArtists,
+    bool? isScanning,
+    TrackSortBy? trackSortBy,
+    AlbumSortBy? albumSortBy,
+    SortOrder? trackSortOrder,
+    SortOrder? albumSortOrder,
   }) {
     return LibraryState(
       playlists: playlists ?? this.playlists,
@@ -32,6 +51,11 @@ class LibraryState extends Equatable {
       favoriteTrackIds: favoriteTrackIds ?? this.favoriteTrackIds,
       libraryAlbums: libraryAlbums ?? this.libraryAlbums,
       libraryArtists: libraryArtists ?? this.libraryArtists,
+      isScanning: isScanning ?? this.isScanning,
+      trackSortBy: trackSortBy ?? this.trackSortBy,
+      albumSortBy: albumSortBy ?? this.albumSortBy,
+      trackSortOrder: trackSortOrder ?? this.trackSortOrder,
+      albumSortOrder: albumSortOrder ?? this.albumSortOrder,
     );
   }
 
@@ -41,6 +65,11 @@ class LibraryState extends Equatable {
     libraryTracks,
     favoriteTrackIds,
     libraryAlbums,
-    libraryArtists
+    libraryArtists,
+    isScanning,
+    trackSortBy,
+    albumSortBy,
+    trackSortOrder,
+    albumSortOrder
   ];
 }

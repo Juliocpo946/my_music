@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +18,25 @@ class MiniPlayer extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
+    Widget imageWidget;
+    if (currentTrack.isLocal && currentTrack.embeddedPicture != null) {
+      imageWidget = Image.memory(currentTrack.embeddedPicture as Uint8List, fit: BoxFit.cover, width: 48, height: 48,);
+    } else if (!currentTrack.isLocal && currentTrack.albumCover.isNotEmpty) {
+      imageWidget = CachedNetworkImage(
+        imageUrl: currentTrack.albumCover,
+        width: 48,
+        height: 48,
+        fit: BoxFit.cover,
+      );
+    } else {
+      imageWidget = Container(
+        width: 48,
+        height: 48,
+        color: Colors.grey.shade800,
+        child: const Icon(Icons.music_note, color: Colors.white),
+      );
+    }
+
     return GestureDetector(
       onTap: () => context.push('/player'),
       child: Container(
@@ -24,7 +44,7 @@ class MiniPlayer extends ConsumerWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF2A2A2A),
           border: Border(
-            top: BorderSide(color: Colors.black.withAlpha(128), width: 1),
+            top: BorderSide(color: Colors.black.withOpacity(0.5), width: 1),
           ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -32,11 +52,7 @@ class MiniPlayer extends ConsumerWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
-              child: CachedNetworkImage(
-                imageUrl: currentTrack.albumCover,
-                width: 48,
-                height: 48,
-              ),
+              child: imageWidget,
             ),
             const SizedBox(width: 12),
             Expanded(

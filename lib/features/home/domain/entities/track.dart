@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:equatable/equatable.dart';
 import 'artist.dart';
 
@@ -10,6 +11,9 @@ class Track extends Equatable {
   final String albumTitle;
   final String albumCover;
   final int duration;
+  final bool isLocal;
+  final String? filePath;
+  final Uint8List? embeddedPicture;
 
   const Track({
     required this.id,
@@ -20,8 +24,11 @@ class Track extends Equatable {
     required this.albumTitle,
     required this.albumCover,
     required this.duration,
+    this.isLocal = false,
+    this.filePath,
+    this.embeddedPicture,
   });
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [id, isLocal, filePath];
 }

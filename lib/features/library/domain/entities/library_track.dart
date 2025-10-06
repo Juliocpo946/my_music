@@ -10,5 +10,8 @@ class LibraryTrack extends Track {
     required super.albumTitle,
     required super.albumCover,
     required super.duration,
+    required super.isLocal,
+    super.filePath,
+    super.embeddedPicture,
   });
 }

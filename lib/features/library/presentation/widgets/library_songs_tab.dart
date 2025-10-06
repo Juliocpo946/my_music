@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_music/features/home/presentation/widgets/song_list_item.dart';
 import '../viewmodels/library_viewmodel.dart';
+import '../viewmodels/library_state.dart';
 
 class LibrarySongsTab extends ConsumerWidget {
   final String searchQuery;
@@ -10,6 +11,7 @@ class LibrarySongsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final libraryState = ref.watch(libraryViewModelProvider);
+    final libraryNotifier = ref.read(libraryViewModelProvider.notifier);
 
     return libraryState.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -28,11 +30,47 @@ class LibrarySongsTab extends ConsumerWidget {
                 : 'No se encontraron canciones.'),
           );
         }
-        return ListView.builder(
-          itemCount: filteredTracks.length,
-          itemBuilder: (context, index) {
-            return SongListItem(track: filteredTracks[index]);
-          },
+        return Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  Text(
+                    '${filteredTracks.length} ${filteredTracks.length == 1 ? "canción" : "canciones"}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const Spacer(),
+                  PopupMenuButton<TrackSortBy>(
+                    initialValue: data.trackSortBy,
+                    onSelected: (sortBy) {
+                      libraryNotifier.sortTracks(sortBy, data.trackSortOrder);
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(value: TrackSortBy.name, child: Text('Ordenar por Nombre')),
+                      const PopupMenuItem(value: TrackSortBy.dateAdded, child: Text('Ordenar por Fecha')),
+                    ],
+                    child: const Icon(Icons.sort),
+                  ),
+                  IconButton(
+                    icon: Icon(data.trackSortOrder == SortOrder.asc ? Icons.arrow_upward : Icons.arrow_downward),
+                    onPressed: () {
+                      final newOrder = data.trackSortOrder == SortOrder.asc ? SortOrder.desc : SortOrder.asc;
+                      libraryNotifier.sortTracks(data.trackSortBy, newOrder);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredTracks.length,
+                itemBuilder: (context, index) {
+                  return SongListItem(track: filteredTracks[index]);
+                },
+              ),
+            ),
+          ],
         );
       },
     );

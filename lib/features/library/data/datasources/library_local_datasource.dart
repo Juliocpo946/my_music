@@ -25,6 +25,9 @@ abstract class LibraryLocalDataSource {
   Future<void> createPlaylist(String name);
   Future<void> addTrackToPlaylist(int playlistId, Track track);
   Future<void> deletePlaylist(int playlistId);
+  Future<List<String>> getFolders();
+  Future<List<TrackModel>> getTracksByFolder(String folderPath);
+  Future<void> clearLocalSongs();
 }
 
 class LibraryLocalDataSourceImpl implements LibraryLocalDataSource {
@@ -190,5 +193,41 @@ class LibraryLocalDataSourceImpl implements LibraryLocalDataSource {
   Future<void> deletePlaylist(int playlistId) async {
     final db = await dbHelper.database;
     await db.delete('playlists', where: 'id = ?', whereArgs: [playlistId]);
+  }
+  @override
+  Future<List<String>> getFolders() async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'library_tracks',
+      distinct: true,
+      columns: ['filePath'],
+    );
+
+    final paths = maps.map((map) => (map['filePath'] as String)).toList();
+    final folderPaths = paths.map((path) {
+      return path.substring(0, path.lastIndexOf('/'));
+    }).toSet().toList();
+
+    return folderPaths;
+  }
+
+  @override
+  Future<List<TrackModel>> getTracksByFolder(String folderPath) async {
+    final db = await dbHelper.database;
+    final maps = await db.query(
+      'library_tracks',
+      where: 'filePath LIKE ?',
+      whereArgs: ['$folderPath%'],
+    );
+    return List.generate(maps.length, (i) {
+      final model = LibraryTrackModel.fromMap(maps[i]);
+      return model.toTrackModel();
+    });
+  }
+
+  @override
+  Future<void> clearLocalSongs() async {
+    final db = await dbHelper.database;
+    await db.delete('library_tracks', where: 'filePath IS NOT NULL');
   }
 }

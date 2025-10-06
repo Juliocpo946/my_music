@@ -21,4 +21,5 @@ abstract class LibraryRepository {
   Future<void> createPlaylist(String name);
   Future<void> addTrackToPlaylist(int playlistId, Track track);
   Future<void> deletePlaylist(int playlistId);
+  Future<void> clearLocalSongs();
 }

@@ -53,7 +53,9 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
       return ClipRRect(
         key: const ValueKey('albumArt'),
         borderRadius: BorderRadius.circular(16),
-        child: CachedNetworkImage(
+        child: track.isLocal
+            ? buildPlaceholderArt()
+            : CachedNetworkImage(
           imageUrl: track.albumCover.replaceAll('250x250', '500x500'),
           width: MediaQuery.of(context).size.width - 48,
           height: MediaQuery.of(context).size.width - 48,
@@ -72,7 +74,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
         width: MediaQuery.of(context).size.width - 48,
         height: MediaQuery.of(context).size.width - 48,
         decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.3),
+          color: Colors.black.withOpacity(0.3),
           borderRadius: BorderRadius.circular(16),
         ),
         child: lyricsAsync.when(
@@ -108,7 +110,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
               style: Theme.of(context)
                   .textTheme
                   .labelSmall
-                  ?.copyWith(color: Colors.white.withAlpha(178)),
+                  ?.copyWith(color: Colors.white70),
             ),
             Text(track.albumTitle,
                 style: Theme.of(context).textTheme.bodyMedium),
@@ -129,7 +131,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
       ),
       body: Stack(
         children: [
-          if (_showAlbumArt && !_showLyrics)
+          if (_showAlbumArt && !_showLyrics && !track.isLocal)
             ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
               child: Container(
@@ -141,14 +143,13 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                 ),
               ),
             ),
-          if (_showAlbumArt && !_showLyrics)
-            Container(color: Colors.black.withValues(alpha: 0.5)),
+          Container(color: Colors.black.withOpacity(0.5)),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 children: [
-                  const Spacer(flex: 1),
+                  const Spacer(),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 500),
                     child: _showLyrics
@@ -164,7 +165,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                       ),
                     ),
                   ),
-                  const Spacer(flex: 1),
+                  const Spacer(),
                   ToggleButtons(
                     isSelected: [_showLyrics == false, _showLyrics == true],
                     onPressed: (index) {
@@ -189,7 +190,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                       ),
                     ],
                   ),
-                  const Spacer(flex: 1),
+                  const Spacer(),
                   Column(
                     key: const ValueKey('playerControls'),
                     children: [
@@ -268,7 +269,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                         progress: playerState.position,
                         total: playerState.duration,
                         onSeek: playerNotifier.seek,
-                        baseBarColor: Colors.white.withAlpha(77),
+                        baseBarColor: Colors.white.withOpacity(0.24),
                         progressBarColor: accentColor,
                         thumbColor: accentColor,
                         timeLabelTextStyle: const TextStyle(
@@ -280,7 +281,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                         children: [
                           IconButton(
                             icon: Icon(Icons.shuffle, color: accentColor),
-                            onPressed: () {},
+                            onPressed: playerNotifier.toggleShuffle,
                             iconSize: 28,
                           ),
                           IconButton(
@@ -293,6 +294,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                             onTap: playerState.isPlaying
                                 ? playerNotifier.pause
                                 : playerNotifier.resume,
+                            onLongPress: (){},
                             child: CircleAvatar(
                               radius: 35,
                               backgroundColor: Colors.white,
@@ -312,14 +314,27 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                           ),
                           IconButton(
                             icon: Icon(Icons.repeat, color: accentColor),
-                            onPressed: () {},
+                            onPressed: playerNotifier.toggleLoopMode,
                             iconSize: 28,
                           ),
                         ],
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.replay_10, color: Colors.white),
+                            onPressed: playerNotifier.rewind,
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.forward_10, color: Colors.white),
+                            onPressed: playerNotifier.forward,
+                          ),
+                        ],
+                      )
                     ],
                   ),
-                  const Spacer(flex: 1),
+                  const Spacer(),
                 ],
               ),
             ),

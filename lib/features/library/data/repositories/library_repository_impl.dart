@@ -63,4 +63,7 @@ class LibraryRepositoryImpl implements LibraryRepository {
   @override
   Future<void> deletePlaylist(int playlistId) =>
       localDataSource.deletePlaylist(playlistId);
+
+  @override
+  Future<void> clearLocalSongs() => localDataSource.clearLocalSongs();
 }

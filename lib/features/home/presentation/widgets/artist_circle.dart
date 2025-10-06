@@ -10,24 +10,32 @@ class ArtistCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push('/home/artist/${artist.id}'),
+      onTap: () {
+        if (artist.id != 0 && artist.id.toString().length > 5) { // Deezer IDs
+          context.push('/home/artist/${artist.id}');
+        } else if (artist.id != 0) {
+          context.push('/library/local-artist/${artist.name}');
+        }
+      },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircleAvatar(
             radius: 45,
-            backgroundColor: Colors.grey.shade800,
+            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.3),
             child: ClipOval(
-              child: CachedNetworkImage(
+              child: artist.pictureMedium.isNotEmpty
+                  ? CachedNetworkImage(
                 imageUrl: artist.pictureMedium,
-                placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator(strokeWidth: 2.0)),
+                placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(strokeWidth: 2.0)),
                 errorWidget: (context, url, error) =>
                 const Icon(Icons.person, size: 40),
                 fit: BoxFit.cover,
                 width: 90,
                 height: 90,
-              ),
+              )
+                  : const Icon(Icons.person, size: 40, color: Colors.white),
             ),
           ),
           const SizedBox(height: 8),

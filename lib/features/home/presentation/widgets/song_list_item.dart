@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,23 +16,37 @@ class SongListItem extends ConsumerWidget {
     final isPlayingThisTrack =
         playerState.isPlaying && playerState.currentTrack?.id == track.id;
 
+    Widget imageWidget;
+    if (track.isLocal && track.embeddedPicture != null) {
+      imageWidget = Image.memory(track.embeddedPicture as Uint8List, fit: BoxFit.cover, width: 50, height: 50,);
+    } else if (!track.isLocal && track.albumCover.isNotEmpty) {
+      imageWidget = CachedNetworkImage(
+        imageUrl: track.albumCover,
+        width: 50,
+        height: 50,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => Container(color: Colors.grey[850]),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
+      );
+    } else {
+      imageWidget = Container(
+        width: 50,
+        height: 50,
+        color: Theme.of(context).primaryColor.withOpacity(0.3),
+        child: const Icon(Icons.music_note, color: Colors.white),
+      );
+    }
+
     return ListTile(
       tileColor: isPlayingThisTrack
-          ? Theme.of(context).primaryColor.withValues(alpha: 0.25)
+          ? Theme.of(context).primaryColor.withOpacity(0.25)
           : null,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(4.0),
-        child: CachedNetworkImage(
-          imageUrl: track.albumCover,
-          width: 50,
-          height: 50,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => Container(color: Colors.grey[850]),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
-        ),
+        child: imageWidget,
       ),
       title: Text(track.title, style: Theme.of(context).textTheme.bodyLarge),
       subtitle:
