@@ -55,9 +55,18 @@ class SongListItem extends ConsumerWidget {
         borderRadius: BorderRadius.circular(4.0),
         child: imageWidget,
       ),
-      title: Text(track.title, style: Theme.of(context).textTheme.bodyLarge),
-      subtitle:
-      Text(track.artist.name, style: Theme.of(context).textTheme.bodyMedium),
+      title: Text(
+        track.title,
+        style: Theme.of(context).textTheme.bodyLarge,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        track.artist.name,
+        style: Theme.of(context).textTheme.bodyMedium,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: IconButton(
         icon: const Icon(Icons.more_vert),
         onPressed: () {
