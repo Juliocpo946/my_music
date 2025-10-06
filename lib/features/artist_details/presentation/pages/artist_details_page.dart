@@ -28,8 +28,11 @@ class ArtistDetailsPage extends ConsumerWidget {
       ),
       body: artistDetailsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => const Center(child: Text('No se pudo cargar la información del artista.')),
+        error: (err, stack) => const Center(
+            child: Text('No se pudo cargar la información del artista.')),
         data: (details) {
+          final allTracks = [...details.localTracks, ...details.topTracks];
+
           return ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
@@ -41,15 +44,20 @@ class ArtistDetailsPage extends ConsumerWidget {
                     width: 200,
                     child: details.artist.pictureMedium.isNotEmpty
                         ? CachedNetworkImage(
-                      imageUrl: details.artist.pictureMedium.replaceAll('250x250', '500x500'),
+                      imageUrl: details.artist.pictureMedium
+                          .replaceAll('250x250', '500x500'),
                       fit: BoxFit.cover,
                       errorWidget: (context, url, error) => Container(
-                        color: Theme.of(context).primaryColor.withOpacity(0.3),
-                        child: const Icon(Icons.person, color: Colors.white, size: 100),
+                        color: Theme.of(context)
+                            .primaryColor
+                            .withOpacity(0.3),
+                        child: const Icon(Icons.person,
+                            color: Colors.white, size: 100),
                       ),
                     )
                         : Container(
-                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                      color:
+                      Theme.of(context).primaryColor.withOpacity(0.3),
                       child: const Icon(
                         Icons.person,
                         color: Colors.white,
@@ -73,19 +81,24 @@ class ArtistDetailsPage extends ConsumerWidget {
                 ),
               if (details.localTracks.isNotEmpty) ...[
                 const SizedBox(height: 32),
-                Text('En tu biblioteca', style: Theme.of(context).textTheme.headlineMedium),
+                Text('En tu biblioteca',
+                    style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 8),
-                ...details.localTracks.map((track) => SongListItem(track: track)),
+                ...details.localTracks
+                    .map((track) => SongListItem(track: track, queue: allTracks)),
               ],
               if (details.topTracks.isNotEmpty) ...[
                 const SizedBox(height: 32),
-                Text('Canciones Populares', style: Theme.of(context).textTheme.headlineMedium),
+                Text('Canciones Populares',
+                    style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 8),
-                ...details.topTracks.map((track) => SongListItem(track: track)),
+                ...details.topTracks
+                    .map((track) => SongListItem(track: track, queue: allTracks)),
               ],
               if (details.albums.isNotEmpty) ...[
                 const SizedBox(height: 32),
-                Text('Discografía', style: Theme.of(context).textTheme.headlineMedium),
+                Text('Discografía',
+                    style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 16),
                 SizedBox(
                   height: 220,

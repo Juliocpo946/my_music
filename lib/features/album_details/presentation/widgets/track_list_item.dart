@@ -9,6 +9,7 @@ class TrackListItem extends ConsumerWidget {
   final String cover;
   final int albumId;
   final String albumTitle;
+  final List<Track> queue;
 
   const TrackListItem({
     super.key,
@@ -16,6 +17,7 @@ class TrackListItem extends ConsumerWidget {
     required this.cover,
     required this.albumId,
     required this.albumTitle,
+    required this.queue,
   });
 
   @override
@@ -67,7 +69,7 @@ class TrackListItem extends ConsumerWidget {
         },
       ),
       onTap: () {
-        playerNotifier.playTrack(trackToPlay);
+        playerNotifier.playTrack(trackToPlay, queue: queue);
       },
     );
   }

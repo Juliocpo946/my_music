@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_music/features/library/presentation/viewmodels/library_viewmodel.dart';
+import 'package:my_music/features/player/domain/entities/player_state.dart';
 import 'package:my_music/features/player/presentation/providers/lyrics_provider.dart';
 import 'package:my_music/features/player/presentation/viewmodels/player_viewmodel.dart';
-import 'package:my_music/shared/widgets/add_to_playlist_dialog.dart';
+import 'package:my_music/shared/widgets/playback_queue_bottom_sheet.dart';
 import 'package:my_music/shared/widgets/track_options_menu.dart';
 
 class PlayerPage extends ConsumerStatefulWidget {
@@ -20,6 +21,17 @@ class PlayerPage extends ConsumerStatefulWidget {
 class _PlayerPageState extends ConsumerState<PlayerPage> {
   bool _showAlbumArt = true;
   bool _showLyrics = false;
+
+  Widget _buildPlaybackModeButton(
+      PlaybackMode mode, VoidCallback onPressed, Color accentColor) {
+    final icon = switch (mode) {
+      PlaybackMode.normal => Icon(Icons.repeat, color: Colors.white.withOpacity(0.7)),
+      PlaybackMode.loopAll => Icon(Icons.repeat, color: accentColor),
+      PlaybackMode.loopOne => Icon(Icons.repeat_one, color: accentColor),
+      PlaybackMode.shuffle => Icon(Icons.shuffle, color: accentColor),
+    };
+    return IconButton(icon: icon, onPressed: onPressed, iconSize: 28);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -214,54 +226,34 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                               ],
                             ),
                           ),
-                          Row(
-                            children: [
-                              libraryStateAsync.when(
-                                data: (libraryState) {
-                                  final isFavorite = libraryState
-                                      .favoriteTrackIds
-                                      .contains(track.id);
-                                  return IconButton(
-                                    icon: Icon(isFavorite
-                                        ? Icons.favorite
-                                        : Icons.favorite_border),
-                                    color: isFavorite
-                                        ? accentColor
-                                        : Colors.white,
-                                    onPressed: () {
-                                      if (isFavorite) {
-                                        libraryNotifier
-                                            .removeFavorite(track.id);
-                                      } else {
-                                        libraryNotifier.addFavorite(track);
-                                      }
-                                    },
-                                    iconSize: 28,
-                                  );
-                                },
-                                loading: () => const IconButton(
-                                    icon: Icon(Icons.favorite_border),
-                                    onPressed: null,
-                                    iconSize: 28),
-                                error: (_, __) => const IconButton(
-                                    icon: Icon(Icons.error),
-                                    onPressed: null,
-                                    iconSize: 28),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.playlist_add),
-                                color: Colors.white,
+                          libraryStateAsync.when(
+                            data: (libraryState) {
+                              final isFavorite = libraryState.favoriteTrackIds
+                                  .contains(track.id);
+                              return IconButton(
+                                icon: Icon(isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border),
+                                color: isFavorite ? accentColor : Colors.white,
                                 onPressed: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    builder: (_) =>
-                                        AddToPlaylistDialog(track: track),
-                                  );
+                                  if (isFavorite) {
+                                    libraryNotifier.removeFavorite(track.id);
+                                  } else {
+                                    libraryNotifier.addFavorite(track);
+                                  }
                                 },
-                                iconSize: 32,
-                              ),
-                            ],
-                          )
+                                iconSize: 28,
+                              );
+                            },
+                            loading: () => const IconButton(
+                                icon: Icon(Icons.favorite_border),
+                                onPressed: null,
+                                iconSize: 28),
+                            error: (_, __) => const IconButton(
+                                icon: Icon(Icons.error),
+                                onPressed: null,
+                                iconSize: 28),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -272,21 +264,29 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                         baseBarColor: Colors.white.withOpacity(0.24),
                         progressBarColor: accentColor,
                         thumbColor: accentColor,
-                        timeLabelTextStyle: const TextStyle(
-                            color: Colors.white, fontSize: 12),
+                        timeLabelTextStyle:
+                        const TextStyle(color: Colors.white, fontSize: 12),
                       ),
                       const SizedBox(height: 10),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.shuffle, color: accentColor),
-                            onPressed: playerNotifier.toggleShuffle,
+                            icon: const Icon(Icons.queue_music,
+                                color: Colors.white),
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (_) =>
+                                const PlaybackQueueBottomSheet(),
+                              );
+                            },
                             iconSize: 28,
                           ),
                           IconButton(
-                            icon:
-                            Icon(Icons.skip_previous, color: accentColor),
+                            icon: const Icon(Icons.skip_previous),
                             onPressed: playerNotifier.previousTrack,
                             iconSize: 40,
                           ),
@@ -294,7 +294,6 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                             onTap: playerState.isPlaying
                                 ? playerNotifier.pause
                                 : playerNotifier.resume,
-                            onLongPress: (){},
                             child: CircleAvatar(
                               radius: 35,
                               backgroundColor: Colors.white,
@@ -308,30 +307,17 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.skip_next, color: accentColor),
+                            icon: const Icon(Icons.skip_next),
                             onPressed: playerNotifier.nextTrack,
                             iconSize: 40,
                           ),
-                          IconButton(
-                            icon: Icon(Icons.repeat, color: accentColor),
-                            onPressed: playerNotifier.toggleLoopMode,
-                            iconSize: 28,
+                          _buildPlaybackModeButton(
+                            playerState.playbackMode,
+                            playerNotifier.cyclePlaybackMode,
+                            accentColor,
                           ),
                         ],
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.replay_10, color: Colors.white),
-                            onPressed: playerNotifier.rewind,
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.forward_10, color: Colors.white),
-                            onPressed: playerNotifier.forward,
-                          ),
-                        ],
-                      )
                     ],
                   ),
                   const Spacer(),

@@ -38,14 +38,20 @@ class ProfilePage extends ConsumerWidget {
             leading: const Icon(Icons.palette),
             title: const Text('Color de Acento'),
             subtitle: const Text('Personaliza la apariencia de la app'),
-            onTap: () => _showColorPicker(
-                context, ref.read(accentColorNotifierProvider).value, accentColorNotifier),
+            onTap: () => _showColorPicker(context,
+                ref.read(accentColorNotifierProvider).value, accentColorNotifier),
           ),
           ListTile(
             leading: const Icon(Icons.music_note),
             title: const Text('Géneros Favoritos'),
             subtitle: const Text('Modifica tus preferencias musicales'),
             onTap: () => context.push('/profile/edit-genres'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.shield_moon_outlined),
+            title: const Text('Gestionar Santuario'),
+            subtitle: const Text('Ver canciones locales ocultas'),
+            onTap: () => context.push('/profile/hidden-songs'),
           ),
           const Divider(),
           ListTile(
@@ -98,8 +104,8 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  void _showColorPicker(
-      BuildContext context, Color? currentColor, AccentColorNotifier notifier) {
+  void _showColorPicker(BuildContext context, Color? currentColor,
+      AccentColorNotifier notifier) {
     final colors = {
       'Azul Eléctrico': AppColors.electricBlue,
       'Púrpura Neón': AppColors.neonPurple,

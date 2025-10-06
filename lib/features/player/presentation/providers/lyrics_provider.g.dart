@@ -6,7 +6,7 @@ part of 'lyrics_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$lyricsHash() => r'5a5d4b6ea9ec0ee401c4dba70b00d9445f862026';
+String _$lyricsHash() => r'7dbed24608066747e6f22f5364a1ff2e16d81341';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -75,7 +75,7 @@ class LyricsFamily extends Family<AsyncValue<String>> {
 }
 
 /// See also [lyrics].
-class LyricsProvider extends AutoDisposeFutureProvider<String> {
+class LyricsProvider extends FutureProvider<String> {
   /// See also [lyrics].
   LyricsProvider({
     required String artist,
@@ -132,7 +132,7 @@ class LyricsProvider extends AutoDisposeFutureProvider<String> {
   }
 
   @override
-  AutoDisposeFutureProviderElement<String> createElement() {
+  FutureProviderElement<String> createElement() {
     return _LyricsProviderElement(this);
   }
 
@@ -155,7 +155,7 @@ class LyricsProvider extends AutoDisposeFutureProvider<String> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin LyricsRef on AutoDisposeFutureProviderRef<String> {
+mixin LyricsRef on FutureProviderRef<String> {
   /// The parameter `artist` of this provider.
   String get artist;
 
@@ -163,7 +163,7 @@ mixin LyricsRef on AutoDisposeFutureProviderRef<String> {
   String get track;
 }
 
-class _LyricsProviderElement extends AutoDisposeFutureProviderElement<String>
+class _LyricsProviderElement extends FutureProviderElement<String>
     with LyricsRef {
   _LyricsProviderElement(super.provider);
 

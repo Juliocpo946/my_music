@@ -6,7 +6,23 @@ part of 'library_viewmodel.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$libraryViewModelHash() => r'bb5bb22d1a765ecb499d180d0ff31b0ac1cd28a4';
+String _$hiddenTracksHash() => r'd1d9a7e1cc4021d5e5c535b2095ab4021e555534';
+
+/// See also [hiddenTracks].
+@ProviderFor(hiddenTracks)
+final hiddenTracksProvider = AutoDisposeFutureProvider<List<Track>>.internal(
+  hiddenTracks,
+  name: r'hiddenTracksProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$hiddenTracksHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef HiddenTracksRef = AutoDisposeFutureProviderRef<List<Track>>;
+String _$libraryViewModelHash() => r'b518504f5652c5b5a0f1c630ed683df7305aa90f';
 
 /// See also [LibraryViewModel].
 @ProviderFor(LibraryViewModel)

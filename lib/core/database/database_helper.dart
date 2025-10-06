@@ -9,14 +9,15 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('music_v8.db');
+    _database = await _initDB('music_v9.db');
     return _database!;
   }
 
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 5, onCreate: _createDB, onUpgrade: _onUpgrade);
+    return await openDatabase(path,
+        version: 6, onCreate: _createDB, onUpgrade: _onUpgrade);
   }
 
   Future _createDB(Database db, int version) async {
@@ -59,19 +60,17 @@ class DatabaseHelper {
       FOREIGN KEY (playlist_id) REFERENCES playlists (id) ON DELETE CASCADE
     )
     ''');
-    await db.execute(
-        'CREATE TABLE user_settings (key TEXT PRIMARY KEY, value TEXT)');
     await db
-        .execute('CREATE TABLE user_genres (name TEXT PRIMARY KEY)');
+        .execute('CREATE TABLE user_settings (key TEXT PRIMARY KEY, value TEXT)');
+    await db.execute('CREATE TABLE user_genres (name TEXT PRIMARY KEY)');
+    await db
+        .execute('CREATE TABLE hidden_tracks (filePath TEXT PRIMARY KEY)');
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    await db.execute('DROP TABLE IF EXISTS library_tracks');
-    await db.execute('DROP TABLE IF EXISTS favorite_tracks');
-    await db.execute('DROP TABLE IF EXISTS playlists');
-    await db.execute('DROP TABLE IF EXISTS playlist_tracks');
-    await db.execute('DROP TABLE IF EXISTS user_settings');
-    await db.execute('DROP TABLE IF EXISTS user_genres');
-    await _createDB(db, newVersion);
+    if (oldVersion < 6) {
+      await db
+          .execute('CREATE TABLE hidden_tracks (filePath TEXT PRIMARY KEY)');
+    }
   }
 }

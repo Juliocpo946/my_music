@@ -66,4 +66,14 @@ class LibraryRepositoryImpl implements LibraryRepository {
 
   @override
   Future<void> clearLocalSongs() => localDataSource.clearLocalSongs();
+
+  @override
+  Future<void> hideTrack(String filePath) => localDataSource.hideTrack(filePath);
+
+  @override
+  Future<void> unhideTrack(String filePath) =>
+      localDataSource.unhideTrack(filePath);
+
+  @override
+  Future<List<Track>> getHiddenTracks() => localDataSource.getHiddenTracks();
 }

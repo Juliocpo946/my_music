@@ -14,7 +14,7 @@ Future<bool> _isConnected() async {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<String> lyrics(Ref ref,
     {required String artist, required String track}) async {
 

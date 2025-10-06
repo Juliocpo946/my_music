@@ -9,6 +9,7 @@ import 'package:my_music/features/library/presentation/pages/library_page.dart';
 import 'package:my_music/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:my_music/features/player/presentation/pages/player_page.dart';
 import 'package:my_music/features/profile/presentation/pages/edit_genres_page.dart';
+import 'package:my_music/features/profile/presentation/pages/hidden_songs_page.dart';
 import 'package:my_music/features/profile/presentation/pages/profile_page.dart';
 import 'package:my_music/features/recommendations/presentation/pages/recommendations_page.dart';
 import 'package:my_music/features/search/presentation/pages/search_page.dart';
@@ -30,7 +31,8 @@ GoRouter appRouter(Ref ref) {
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/home',
     redirect: (context, state) async {
-      final onboardingComplete = await settingsRepository.isOnboardingComplete();
+      final onboardingComplete =
+      await settingsRepository.isOnboardingComplete();
       final isGoingToOnboarding = state.matchedLocation == '/onboarding';
 
       if (!onboardingComplete && !isGoingToOnboarding) {
@@ -66,7 +68,7 @@ GoRouter appRouter(Ref ref) {
                       final title = state.uri.queryParameters['title'];
                       return AlbumDetailsPage(
                         albumId: albumId,
-                        localAlbumTitle: title != null ? Uri.decodeComponent(title) : null,
+                        localAlbumTitle: title,
                       );
                     },
                   ),
@@ -77,7 +79,7 @@ GoRouter appRouter(Ref ref) {
                       final name = state.uri.queryParameters['name'];
                       return ArtistDetailsPage(
                         artistId: artistId,
-                        localArtistName: name != null ? Uri.decodeComponent(name) : null,
+                        localArtistName: name,
                       );
                     },
                   ),
@@ -117,12 +119,12 @@ GoRouter appRouter(Ref ref) {
                     GoRoute(
                       path: 'playlist/:id',
                       builder: (context, state) {
-                        final playlistId = int.parse(state.pathParameters['id']!);
+                        final playlistId =
+                        int.parse(state.pathParameters['id']!);
                         return PlaylistDetailsPage(playlistId: playlistId);
                       },
                     ),
-                  ]
-              ),
+                  ]),
             ],
           ),
           StatefulShellBranch(
@@ -136,9 +138,12 @@ GoRouter appRouter(Ref ref) {
                     GoRoute(
                       path: 'edit-genres',
                       builder: (context, state) => const EditGenresPage(),
-                    )
-                  ]
-              ),
+                    ),
+                    GoRoute(
+                      path: 'hidden-songs',
+                      builder: (context, state) => const HiddenSongsPage(),
+                    ),
+                  ]),
             ],
           ),
         ],

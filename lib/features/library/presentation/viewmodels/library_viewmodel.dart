@@ -1,5 +1,6 @@
 import 'package:my_music/features/home/domain/entities/artist.dart';
 import 'package:my_music/features/library/domain/services/metadata_service.dart';
+import 'package:my_music/features/player/presentation/viewmodels/player_viewmodel.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:my_music/features/home/domain/entities/album.dart';
@@ -49,7 +50,8 @@ class LibraryViewModel extends _$LibraryViewModel {
     if (status.isGranted) {
       state = AsyncData(state.value!.copyWith(isScanning: true));
 
-      final List<Map<dynamic, dynamic>> nativeSongs = await _metadataService.scanLocalSongs();
+      final List<Map<dynamic, dynamic>> nativeSongs =
+      await _metadataService.scanLocalSongs();
       if (nativeSongs.isNotEmpty) {
         await _repository.clearLocalSongs();
       }
@@ -63,11 +65,13 @@ class LibraryViewModel extends _$LibraryViewModel {
           id: (songMap['id'] as int?)?.toInt() ?? filePath.hashCode,
           title: songMap['title'] ?? filePath.split('/').last,
           artist: Artist(
-            id: (songMap['artist'] as String? ?? 'Artista Desconocido').hashCode,
+            id: (songMap['artist'] as String? ?? 'Artista Desconocido')
+                .hashCode,
             name: songMap['artist'] ?? 'Artista Desconocido',
             pictureMedium: '',
           ),
-          albumId: (songMap['album'] as String? ?? 'Álbum Desconocido').hashCode,
+          albumId:
+          (songMap['album'] as String? ?? 'Álbum Desconocido').hashCode,
           albumTitle: songMap['album'] ?? 'Álbum Desconocido',
           albumCover: '',
           duration: (songMap['duration'] as int?) ?? 0,
@@ -89,14 +93,14 @@ class LibraryViewModel extends _$LibraryViewModel {
 
   void sortTracks(TrackSortBy sortBy, SortOrder sortOrder) {
     if (state.value == null) return;
-    state = AsyncData(_sortAllData(
-        state.value!.copyWith(trackSortBy: sortBy, trackSortOrder: sortOrder)));
+    state = AsyncData(_sortAllData(state.value!
+        .copyWith(trackSortBy: sortBy, trackSortOrder: sortOrder)));
   }
 
   void sortAlbums(AlbumSortBy sortBy, SortOrder sortOrder) {
     if (state.value == null) return;
-    state = AsyncData(_sortAllData(
-        state.value!.copyWith(albumSortBy: sortBy, albumSortOrder: sortOrder)));
+    state = AsyncData(_sortAllData(state.value!
+        .copyWith(albumSortBy: sortBy, albumSortOrder: sortOrder)));
   }
 
   LibraryState _sortAllData(LibraryState currentState) {
@@ -146,9 +150,10 @@ class LibraryViewModel extends _$LibraryViewModel {
     ref.invalidateSelf();
   }
 
-  Future<void> removeTrackFromLibrary(int trackId) async {
-    await _repository.removeTrackFromLibrary(trackId);
-    await _repository.removeFavorite(trackId);
+  Future<void> removeTrackFromLibrary(Track track) async {
+    await _repository.removeTrackFromLibrary(track.id);
+    await _repository.removeFavorite(track.id);
+    ref.read(playerViewModelProvider.notifier).removeTrackFromQueue(track);
     ref.invalidateSelf();
   }
 
@@ -183,4 +188,26 @@ class LibraryViewModel extends _$LibraryViewModel {
     await _repository.deletePlaylist(playlistId);
     ref.invalidateSelf();
   }
+
+  Future<void> hideTrack(Track track) async {
+    if (track.filePath == null) return;
+    await _repository.hideTrack(track.filePath!);
+    ref.read(playerViewModelProvider.notifier).removeTrackFromQueue(track);
+    ref.invalidateSelf();
+    ref.invalidate(hiddenTracksProvider);
+  }
+
+  Future<void> unhideTrack(Track track) async {
+    if (track.filePath == null) return;
+    await _repository.unhideTrack(track.filePath!);
+    ref.invalidateSelf();
+    ref.invalidate(hiddenTracksProvider);
+  }
+}
+
+@riverpod
+Future<List<Track>> hiddenTracks(HiddenTracksRef ref) async {
+  final repository =
+  LibraryRepositoryImpl(localDataSource: LibraryLocalDataSourceImpl());
+  return repository.getHiddenTracks();
 }

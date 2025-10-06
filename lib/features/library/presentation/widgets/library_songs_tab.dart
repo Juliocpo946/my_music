@@ -33,7 +33,8 @@ class LibrarySongsTab extends ConsumerWidget {
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 children: [
                   Text(
@@ -47,15 +48,23 @@ class LibrarySongsTab extends ConsumerWidget {
                       libraryNotifier.sortTracks(sortBy, data.trackSortOrder);
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(value: TrackSortBy.name, child: Text('Ordenar por Nombre')),
-                      const PopupMenuItem(value: TrackSortBy.dateAdded, child: Text('Ordenar por Fecha')),
+                      const PopupMenuItem(
+                          value: TrackSortBy.name,
+                          child: Text('Ordenar por Nombre')),
+                      const PopupMenuItem(
+                          value: TrackSortBy.dateAdded,
+                          child: Text('Ordenar por Fecha')),
                     ],
                     child: const Icon(Icons.sort),
                   ),
                   IconButton(
-                    icon: Icon(data.trackSortOrder == SortOrder.asc ? Icons.arrow_upward : Icons.arrow_downward),
+                    icon: Icon(data.trackSortOrder == SortOrder.asc
+                        ? Icons.arrow_upward
+                        : Icons.arrow_downward),
                     onPressed: () {
-                      final newOrder = data.trackSortOrder == SortOrder.asc ? SortOrder.desc : SortOrder.asc;
+                      final newOrder = data.trackSortOrder == SortOrder.asc
+                          ? SortOrder.desc
+                          : SortOrder.asc;
                       libraryNotifier.sortTracks(data.trackSortBy, newOrder);
                     },
                   ),
@@ -66,7 +75,8 @@ class LibrarySongsTab extends ConsumerWidget {
               child: ListView.builder(
                 itemCount: filteredTracks.length,
                 itemBuilder: (context, index) {
-                  return SongListItem(track: filteredTracks[index]);
+                  return SongListItem(
+                      track: filteredTracks[index], queue: filteredTracks);
                 },
               ),
             ),

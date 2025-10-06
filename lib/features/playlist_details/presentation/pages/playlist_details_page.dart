@@ -56,7 +56,9 @@ class PlaylistDetailsPage extends ConsumerWidget {
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                      return SongListItem(track: details.tracks[index]);
+                      return SongListItem(
+                          track: details.tracks[index],
+                          queue: details.tracks);
                     },
                     childCount: details.tracks.length,
                   ),

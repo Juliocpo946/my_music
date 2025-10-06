@@ -8,7 +8,9 @@ import '../../domain/entities/track.dart';
 
 class SongListItem extends ConsumerWidget {
   final Track track;
-  const SongListItem({super.key, required this.track});
+  final List<Track>? queue;
+
+  const SongListItem({super.key, required this.track, this.queue});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,7 +20,12 @@ class SongListItem extends ConsumerWidget {
 
     Widget imageWidget;
     if (track.isLocal && track.embeddedPicture != null) {
-      imageWidget = Image.memory(track.embeddedPicture as Uint8List, fit: BoxFit.cover, width: 50, height: 50,);
+      imageWidget = Image.memory(
+        track.embeddedPicture as Uint8List,
+        fit: BoxFit.cover,
+        width: 50,
+        height: 50,
+      );
     } else if (!track.isLocal && track.albumCover.isNotEmpty) {
       imageWidget = CachedNetworkImage(
         imageUrl: track.albumCover,
@@ -61,7 +68,7 @@ class SongListItem extends ConsumerWidget {
         },
       ),
       onTap: () {
-        ref.read(playerViewModelProvider.notifier).playTrack(track);
+        ref.read(playerViewModelProvider.notifier).playTrack(track, queue: queue);
       },
     );
   }
