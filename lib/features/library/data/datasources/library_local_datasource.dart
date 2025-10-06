@@ -28,6 +28,10 @@ abstract class LibraryLocalDataSource {
   Future<List<String>> getFolders();
   Future<List<TrackModel>> getTracksByFolder(String folderPath);
   Future<void> clearLocalSongs();
+  Future<List<TrackModel>> getTracksForAlbum(int albumId);
+  Future<List<TrackModel>> getTracksForArtist(int artistId);
+  Future<List<TrackModel>> getTracksByAlbumTitle(String albumTitle);
+  Future<List<TrackModel>> getTracksByArtistName(String artistName);
 }
 
 class LibraryLocalDataSourceImpl implements LibraryLocalDataSource {
@@ -229,5 +233,45 @@ class LibraryLocalDataSourceImpl implements LibraryLocalDataSource {
   Future<void> clearLocalSongs() async {
     final db = await dbHelper.database;
     await db.delete('library_tracks', where: 'filePath IS NOT NULL');
+  }
+
+  @override
+  Future<List<TrackModel>> getTracksForAlbum(int albumId) async {
+    final db = await dbHelper.database;
+    final maps = await db.query('library_tracks', where: 'albumId = ?', whereArgs: [albumId]);
+    return List.generate(maps.length, (i) {
+      final model = LibraryTrackModel.fromMap(maps[i]);
+      return model.toTrackModel();
+    });
+  }
+
+  @override
+  Future<List<TrackModel>> getTracksForArtist(int artistId) async {
+    final db = await dbHelper.database;
+    final maps = await db.query('library_tracks', where: 'artistId = ?', whereArgs: [artistId]);
+    return List.generate(maps.length, (i) {
+      final model = LibraryTrackModel.fromMap(maps[i]);
+      return model.toTrackModel();
+    });
+  }
+
+  @override
+  Future<List<TrackModel>> getTracksByAlbumTitle(String albumTitle) async {
+    final db = await dbHelper.database;
+    final maps = await db.query('library_tracks', where: 'albumTitle = ? AND isLocal = 1', whereArgs: [albumTitle]);
+    return List.generate(maps.length, (i) {
+      final model = LibraryTrackModel.fromMap(maps[i]);
+      return model.toTrackModel();
+    });
+  }
+
+  @override
+  Future<List<TrackModel>> getTracksByArtistName(String artistName) async {
+    final db = await dbHelper.database;
+    final maps = await db.query('library_tracks', where: 'artistName = ? AND isLocal = 1', whereArgs: [artistName]);
+    return List.generate(maps.length, (i) {
+      final model = LibraryTrackModel.fromMap(maps[i]);
+      return model.toTrackModel();
+    });
   }
 }

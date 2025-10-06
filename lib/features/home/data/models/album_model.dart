@@ -9,13 +9,16 @@ class AlbumModel extends Album {
   });
 
   factory AlbumModel.fromJson(Map<String, dynamic> json) {
+    if (json['id'] == null || json['id'] == 0) {
+      throw Exception('Invalid album data from API');
+    }
     return AlbumModel(
-      id: json['id'] ?? 0,
+      id: json['id'],
       title: json['title'] ?? 'Álbum Desconocido',
       coverMedium: json['cover_medium'] ?? '',
       artistName: json.containsKey('artist') && json['artist'] is Map
           ? json['artist']['name'] ?? 'Artista Desconocido'
-          : '',
+          : 'Artista Desconocido',
     );
   }
 }

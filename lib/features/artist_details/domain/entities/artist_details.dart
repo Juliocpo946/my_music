@@ -7,11 +7,13 @@ class ArtistDetails extends Equatable {
   final Artist artist;
   final List<Track> topTracks;
   final List<Album> albums;
+  final List<Track> localTracks;
 
   const ArtistDetails({
     required this.artist,
     required this.topTracks,
     required this.albums,
+    required this.localTracks,
   });
 
   @override

@@ -11,12 +11,9 @@ class AlbumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (album.id != 0 && album.id.toString().length > 5) {
-          context.push('/home/album/${album.id}');
-        } else if (album.id != 0) {
-          final encodedTitle = Uri.encodeComponent(album.title);
-          context.push('/library/local-album/${album.id}/$encodedTitle');
-        }
+        final encodedTitle = Uri.encodeComponent(album.title);
+        final isLocal = album.id.toString().length <= 5;
+        context.push('/home/album/${album.id}?isLocal=$isLocal&title=$encodedTitle');
       },
       child: Container(
         width: 160,

@@ -8,8 +8,11 @@ class ArtistModel extends Artist {
   });
 
   factory ArtistModel.fromJson(Map<String, dynamic> json) {
+    if (json['id'] == null || json['id'] == 0) {
+      throw Exception('Invalid artist data from API');
+    }
     return ArtistModel(
-      id: json['id'] ?? 0,
+      id: json['id'],
       name: json['name'] ?? 'Artista Desconocido',
       pictureMedium: json['picture_medium'] ?? '',
     );

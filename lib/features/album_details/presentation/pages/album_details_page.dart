@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,11 +8,20 @@ import '../widgets/track_list_item.dart';
 
 class AlbumDetailsPage extends ConsumerWidget {
   final int albumId;
-  const AlbumDetailsPage({super.key, required this.albumId});
+  final String? localAlbumTitle;
+
+  const AlbumDetailsPage({
+    super.key,
+    required this.albumId,
+    this.localAlbumTitle,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final albumDetailsAsync = ref.watch(albumDetailsViewModelProvider(albumId));
+    final albumDetailsAsync = ref.watch(albumDetailsViewModelProvider(
+      albumId: albumId,
+      localAlbumTitle: localAlbumTitle,
+    ));
     final libraryNotifier = ref.read(libraryViewModelProvider.notifier);
 
     return Scaffold(
@@ -20,8 +30,12 @@ class AlbumDetailsPage extends ConsumerWidget {
       ),
       body: albumDetailsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, stack) => const Center(child: Text('No se pudo cargar la información del álbum.')),
         data: (details) {
+          final representativeTrack = details.localTracks.isNotEmpty
+              ? details.localTracks.first
+              : details.tracks.isNotEmpty ? details.tracks.first : null;
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -29,11 +43,37 @@ class AlbumDetailsPage extends ConsumerWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8.0),
-                  child: CachedNetworkImage(
-                    imageUrl: details.coverBig,
+                  child: SizedBox(
                     height: 250,
                     width: 250,
-                    fit: BoxFit.cover,
+                    child: Builder(
+                      builder: (context) {
+                        if (details.coverBig.isNotEmpty) {
+                          return CachedNetworkImage(
+                            imageUrl: details.coverBig,
+                            fit: BoxFit.cover,
+                            errorWidget: (context, url, error) => Container(
+                              color: Theme.of(context).primaryColor.withOpacity(0.3),
+                              child: const Icon(Icons.music_note, color: Colors.white, size: 100),
+                            ),
+                          );
+                        } else if (representativeTrack?.embeddedPicture != null) {
+                          return Image.memory(
+                            representativeTrack!.embeddedPicture as Uint8List,
+                            fit: BoxFit.cover,
+                          );
+                        } else {
+                          return Container(
+                            color: Theme.of(context).primaryColor.withOpacity(0.3),
+                            child: const Icon(
+                              Icons.music_note,
+                              color: Colors.white,
+                              size: 100,
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -42,50 +82,77 @@ class AlbumDetailsPage extends ConsumerWidget {
                   style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
+                if (details.title == 'Álbum Desconocido')
+                  Text(
+                    '(Desconocido)',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
                 Text(
                   details.artistName,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    libraryNotifier.addAlbumToLibrary(details.tracks);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Álbum añadido a Canciones')),
-                    );
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Agregar a Canciones'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 50),
+                if (details.tracks.isNotEmpty)
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      libraryNotifier.addAlbumToLibrary(details.tracks);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Álbum añadido a Canciones')),
+                      );
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Agregar a Canciones'),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Canciones',
-                    style: Theme.of(context).textTheme.headlineMedium,
+
+                if (details.localTracks.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('En tu biblioteca', style: Theme.of(context).textTheme.headlineMedium),
                   ),
-                ),
-                const Divider(height: 24),
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: details.tracks.length,
-                  itemBuilder: (context, index) {
-                    final track = details.tracks[index];
-                    return TrackListItem(
-                      track: track,
-                      cover:
-                      details.coverBig.replaceAll('1000x1000', '250x250'),
-                      albumId: details.id,
-                      albumTitle: details.title,
-                    );
-                  },
-                ),
+                  const Divider(height: 24),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: details.localTracks.length,
+                    itemBuilder: (context, index) {
+                      final track = details.localTracks[index];
+                      return TrackListItem(
+                        track: track,
+                        cover: details.coverBig.replaceAll('1000x1000', '250x250'),
+                        albumId: details.id,
+                        albumTitle: details.title,
+                      );
+                    },
+                  ),
+                ],
+
+                if (details.tracks.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Canciones del álbum', style: Theme.of(context).textTheme.headlineMedium),
+                  ),
+                  const Divider(height: 24),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: details.tracks.length,
+                    itemBuilder: (context, index) {
+                      final track = details.tracks[index];
+                      return TrackListItem(
+                        track: track,
+                        cover: details.coverBig.replaceAll('1000x1000', '250x250'),
+                        albumId: details.id,
+                        albumTitle: details.title,
+                      );
+                    },
+                  ),
+                ]
               ],
             ),
           );

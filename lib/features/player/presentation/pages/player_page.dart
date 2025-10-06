@@ -43,7 +43,7 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
         child: Container(
           width: MediaQuery.of(context).size.width - 48,
           height: MediaQuery.of(context).size.width - 48,
-          color: accentColor,
+          color: accentColor.withOpacity(0.3),
           child: const Icon(Icons.music_note, color: Colors.white, size: 150),
         ),
       );

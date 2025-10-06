@@ -11,11 +11,9 @@ class ArtistCircle extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (artist.id != 0 && artist.id.toString().length > 5) { // Deezer IDs
-          context.push('/home/artist/${artist.id}');
-        } else if (artist.id != 0) {
-          context.push('/library/local-artist/${artist.name}');
-        }
+        final encodedName = Uri.encodeComponent(artist.name);
+        final isLocal = artist.id.toString().length <= 5;
+        context.push('/home/artist/${artist.id}?isLocal=$isLocal&name=$encodedName');
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

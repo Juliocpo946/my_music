@@ -23,6 +23,7 @@ class ArtistDetailsRepositoryImpl implements ArtistDetailsRepository {
         artist: results[0] as Artist,
         topTracks: results[1] as List<Track>,
         albums: results[2] as List<Album>,
+        localTracks: const [],
       );
     } catch (e) {
       throw Exception('Failed to load artist details');

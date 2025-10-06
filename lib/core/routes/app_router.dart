@@ -6,8 +6,6 @@ import 'package:my_music/features/artist_details/presentation/pages/artist_detai
 import 'package:my_music/features/genre_details/presentation/pages/genre_details_page.dart';
 import 'package:my_music/features/home/presentation/pages/home_page.dart';
 import 'package:my_music/features/library/presentation/pages/library_page.dart';
-import 'package:my_music/features/library/presentation/pages/local_album_details_page.dart';
-import 'package:my_music/features/library/presentation/pages/local_artist_details_page.dart';
 import 'package:my_music/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:my_music/features/player/presentation/pages/player_page.dart';
 import 'package:my_music/features/profile/presentation/pages/edit_genres_page.dart';
@@ -65,15 +63,22 @@ GoRouter appRouter(Ref ref) {
                     path: 'album/:id',
                     builder: (context, state) {
                       final albumId = int.parse(state.pathParameters['id']!);
-                      return AlbumDetailsPage(albumId: albumId);
+                      final title = state.uri.queryParameters['title'];
+                      return AlbumDetailsPage(
+                        albumId: albumId,
+                        localAlbumTitle: title != null ? Uri.decodeComponent(title) : null,
+                      );
                     },
                   ),
                   GoRoute(
                     path: 'artist/:id',
                     builder: (context, state) {
-                      final artistId =
-                      int.parse(state.pathParameters['id']!);
-                      return ArtistDetailsPage(artistId: artistId);
+                      final artistId = int.parse(state.pathParameters['id']!);
+                      final name = state.uri.queryParameters['name'];
+                      return ArtistDetailsPage(
+                        artistId: artistId,
+                        localArtistName: name != null ? Uri.decodeComponent(name) : null,
+                      );
                     },
                   ),
                   GoRoute(
@@ -105,33 +110,18 @@ GoRouter appRouter(Ref ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/library',
-                pageBuilder: (context, state) =>
-                const NoTransitionPage(child: LibraryPage()),
-                routes: [
-                  GoRoute(
-                    path: 'playlist/:id',
-                    builder: (context, state) {
-                      final playlistId = int.parse(state.pathParameters['id']!);
-                      return PlaylistDetailsPage(playlistId: playlistId);
-                    },
-                  ),
-                  GoRoute(
-                    path: 'local-album/:id/:title',
-                    builder: (context, state) {
-                      final albumId = int.parse(state.pathParameters['id']!);
-                      final albumTitle = state.pathParameters['title']!;
-                      return LocalAlbumDetailsPage(albumId: albumId, albumTitle: albumTitle);
-                    },
-                  ),
-                  GoRoute(
-                    path: 'local-artist/:name',
-                    builder: (context, state) {
-                      final artistName = state.pathParameters['name']!;
-                      return LocalArtistDetailsPage(artistName: artistName);
-                    },
-                  ),
-                ],
+                  path: '/library',
+                  pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: LibraryPage()),
+                  routes: [
+                    GoRoute(
+                      path: 'playlist/:id',
+                      builder: (context, state) {
+                        final playlistId = int.parse(state.pathParameters['id']!);
+                        return PlaylistDetailsPage(playlistId: playlistId);
+                      },
+                    ),
+                  ]
               ),
             ],
           ),

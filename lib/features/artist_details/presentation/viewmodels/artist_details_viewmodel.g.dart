@@ -7,7 +7,7 @@ part of 'artist_details_viewmodel.dart';
 // **************************************************************************
 
 String _$artistDetailsViewModelHash() =>
-    r'eb5e5605a2bf020554a18bd16b514759987951fe';
+    r'05cabe03265856f1da6cb416b9b3e8732b95a038';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -40,11 +40,13 @@ class ArtistDetailsViewModelFamily extends Family<AsyncValue<ArtistDetails>> {
   const ArtistDetailsViewModelFamily();
 
   /// See also [artistDetailsViewModel].
-  ArtistDetailsViewModelProvider call(
-    int artistId,
-  ) {
+  ArtistDetailsViewModelProvider call({
+    required int artistId,
+    String? localArtistName,
+  }) {
     return ArtistDetailsViewModelProvider(
-      artistId,
+      artistId: artistId,
+      localArtistName: localArtistName,
     );
   }
 
@@ -53,7 +55,8 @@ class ArtistDetailsViewModelFamily extends Family<AsyncValue<ArtistDetails>> {
     covariant ArtistDetailsViewModelProvider provider,
   ) {
     return call(
-      provider.artistId,
+      artistId: provider.artistId,
+      localArtistName: provider.localArtistName,
     );
   }
 
@@ -76,12 +79,14 @@ class ArtistDetailsViewModelFamily extends Family<AsyncValue<ArtistDetails>> {
 class ArtistDetailsViewModelProvider
     extends AutoDisposeFutureProvider<ArtistDetails> {
   /// See also [artistDetailsViewModel].
-  ArtistDetailsViewModelProvider(
-    int artistId,
-  ) : this._internal(
+  ArtistDetailsViewModelProvider({
+    required int artistId,
+    String? localArtistName,
+  }) : this._internal(
           (ref) => artistDetailsViewModel(
             ref as ArtistDetailsViewModelRef,
-            artistId,
+            artistId: artistId,
+            localArtistName: localArtistName,
           ),
           from: artistDetailsViewModelProvider,
           name: r'artistDetailsViewModelProvider',
@@ -93,6 +98,7 @@ class ArtistDetailsViewModelProvider
           allTransitiveDependencies:
               ArtistDetailsViewModelFamily._allTransitiveDependencies,
           artistId: artistId,
+          localArtistName: localArtistName,
         );
 
   ArtistDetailsViewModelProvider._internal(
@@ -103,9 +109,11 @@ class ArtistDetailsViewModelProvider
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.artistId,
+    required this.localArtistName,
   }) : super.internal();
 
   final int artistId;
+  final String? localArtistName;
 
   @override
   Override overrideWith(
@@ -121,6 +129,7 @@ class ArtistDetailsViewModelProvider
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         artistId: artistId,
+        localArtistName: localArtistName,
       ),
     );
   }
@@ -133,13 +142,15 @@ class ArtistDetailsViewModelProvider
   @override
   bool operator ==(Object other) {
     return other is ArtistDetailsViewModelProvider &&
-        other.artistId == artistId;
+        other.artistId == artistId &&
+        other.localArtistName == localArtistName;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, artistId.hashCode);
+    hash = _SystemHash.combine(hash, localArtistName.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -150,6 +161,9 @@ class ArtistDetailsViewModelProvider
 mixin ArtistDetailsViewModelRef on AutoDisposeFutureProviderRef<ArtistDetails> {
   /// The parameter `artistId` of this provider.
   int get artistId;
+
+  /// The parameter `localArtistName` of this provider.
+  String? get localArtistName;
 }
 
 class _ArtistDetailsViewModelProviderElement
@@ -159,6 +173,9 @@ class _ArtistDetailsViewModelProviderElement
 
   @override
   int get artistId => (origin as ArtistDetailsViewModelProvider).artistId;
+  @override
+  String? get localArtistName =>
+      (origin as ArtistDetailsViewModelProvider).localArtistName;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

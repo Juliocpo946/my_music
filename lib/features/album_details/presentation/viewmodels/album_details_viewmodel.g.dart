@@ -7,7 +7,7 @@ part of 'album_details_viewmodel.dart';
 // **************************************************************************
 
 String _$albumDetailsViewModelHash() =>
-    r'eb155dad4c493ca11f49b2b75e808d74125546e4';
+    r'75ed0f872f22c724879360fa11922d7fccefd1e9';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -40,11 +40,13 @@ class AlbumDetailsViewModelFamily extends Family<AsyncValue<AlbumDetails>> {
   const AlbumDetailsViewModelFamily();
 
   /// See also [albumDetailsViewModel].
-  AlbumDetailsViewModelProvider call(
-    int albumId,
-  ) {
+  AlbumDetailsViewModelProvider call({
+    required int albumId,
+    String? localAlbumTitle,
+  }) {
     return AlbumDetailsViewModelProvider(
-      albumId,
+      albumId: albumId,
+      localAlbumTitle: localAlbumTitle,
     );
   }
 
@@ -53,7 +55,8 @@ class AlbumDetailsViewModelFamily extends Family<AsyncValue<AlbumDetails>> {
     covariant AlbumDetailsViewModelProvider provider,
   ) {
     return call(
-      provider.albumId,
+      albumId: provider.albumId,
+      localAlbumTitle: provider.localAlbumTitle,
     );
   }
 
@@ -76,12 +79,14 @@ class AlbumDetailsViewModelFamily extends Family<AsyncValue<AlbumDetails>> {
 class AlbumDetailsViewModelProvider
     extends AutoDisposeFutureProvider<AlbumDetails> {
   /// See also [albumDetailsViewModel].
-  AlbumDetailsViewModelProvider(
-    int albumId,
-  ) : this._internal(
+  AlbumDetailsViewModelProvider({
+    required int albumId,
+    String? localAlbumTitle,
+  }) : this._internal(
           (ref) => albumDetailsViewModel(
             ref as AlbumDetailsViewModelRef,
-            albumId,
+            albumId: albumId,
+            localAlbumTitle: localAlbumTitle,
           ),
           from: albumDetailsViewModelProvider,
           name: r'albumDetailsViewModelProvider',
@@ -93,6 +98,7 @@ class AlbumDetailsViewModelProvider
           allTransitiveDependencies:
               AlbumDetailsViewModelFamily._allTransitiveDependencies,
           albumId: albumId,
+          localAlbumTitle: localAlbumTitle,
         );
 
   AlbumDetailsViewModelProvider._internal(
@@ -103,9 +109,11 @@ class AlbumDetailsViewModelProvider
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.albumId,
+    required this.localAlbumTitle,
   }) : super.internal();
 
   final int albumId;
+  final String? localAlbumTitle;
 
   @override
   Override overrideWith(
@@ -121,6 +129,7 @@ class AlbumDetailsViewModelProvider
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         albumId: albumId,
+        localAlbumTitle: localAlbumTitle,
       ),
     );
   }
@@ -132,13 +141,16 @@ class AlbumDetailsViewModelProvider
 
   @override
   bool operator ==(Object other) {
-    return other is AlbumDetailsViewModelProvider && other.albumId == albumId;
+    return other is AlbumDetailsViewModelProvider &&
+        other.albumId == albumId &&
+        other.localAlbumTitle == localAlbumTitle;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, albumId.hashCode);
+    hash = _SystemHash.combine(hash, localAlbumTitle.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -149,6 +161,9 @@ class AlbumDetailsViewModelProvider
 mixin AlbumDetailsViewModelRef on AutoDisposeFutureProviderRef<AlbumDetails> {
   /// The parameter `albumId` of this provider.
   int get albumId;
+
+  /// The parameter `localAlbumTitle` of this provider.
+  String? get localAlbumTitle;
 }
 
 class _AlbumDetailsViewModelProviderElement
@@ -158,6 +173,9 @@ class _AlbumDetailsViewModelProviderElement
 
   @override
   int get albumId => (origin as AlbumDetailsViewModelProvider).albumId;
+  @override
+  String? get localAlbumTitle =>
+      (origin as AlbumDetailsViewModelProvider).localAlbumTitle;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

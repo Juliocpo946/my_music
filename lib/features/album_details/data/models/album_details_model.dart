@@ -8,9 +8,14 @@ class AlbumDetailsModel extends AlbumDetails {
     required super.coverBig,
     required super.artistName,
     required super.tracks,
+    required super.localTracks,
   });
 
   factory AlbumDetailsModel.fromJson(Map<String, dynamic> json) {
+    if (json['id'] == null || json['id'] == 0) {
+      throw Exception('Invalid album details data from API');
+    }
+
     var tracksData = json['tracks']?['data'];
     List<TrackModel> tracks = [];
     if (tracksData is List) {
@@ -18,11 +23,12 @@ class AlbumDetailsModel extends AlbumDetails {
     }
 
     return AlbumDetailsModel(
-      id: json['id'] ?? 0,
+      id: json['id'],
       title: json['title'] ?? 'Álbum Desconocido',
       coverBig: json['cover_big'] ?? '',
       artistName: json['artist']?['name'] ?? 'Artista Desconocido',
       tracks: tracks,
+      localTracks: const [],
     );
   }
 }

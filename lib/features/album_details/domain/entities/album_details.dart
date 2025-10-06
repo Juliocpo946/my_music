@@ -7,6 +7,7 @@ class AlbumDetails extends Equatable {
   final String coverBig;
   final String artistName;
   final List<Track> tracks;
+  final List<Track> localTracks;
 
   const AlbumDetails({
     required this.id,
@@ -14,6 +15,7 @@ class AlbumDetails extends Equatable {
     required this.coverBig,
     required this.artistName,
     required this.tracks,
+    required this.localTracks,
   });
 
   @override
