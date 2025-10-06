@@ -6,7 +6,7 @@ part of 'player_viewmodel.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$playerViewModelHash() => r'0ef16a67876c81740f9c1a2efbf4f2fb3f243e40';
+String _$playerViewModelHash() => r'6cbd476d8d2072b63629903da9d4445e8a38335f';
 
 /// See also [PlayerViewModel].
 @ProviderFor(PlayerViewModel)

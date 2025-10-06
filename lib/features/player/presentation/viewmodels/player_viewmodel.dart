@@ -1,153 +1,126 @@
 import 'dart:async';
-import 'package:collection/collection.dart';
-import 'package:just_audio/just_audio.dart' hide PlayerState;
+import 'package:audio_service/audio_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:my_music/features/home/domain/entities/track.dart';
+import 'package:my_music/features/home/domain/entities/artist.dart';
 import 'package:my_music/features/player/domain/entities/player_state.dart';
+import 'package:my_music/main.dart';
 
 part 'player_viewmodel.g.dart';
 
 @riverpod
 class PlayerViewModel extends _$PlayerViewModel {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  StreamSubscription? _playerStateSubscription;
-  StreamSubscription? _positionSubscription;
-  StreamSubscription? _sequenceSubscription;
-  StreamSubscription? _durationSubscription;
-
-  List<Track> _currentQueue = [];
+  StreamSubscription? _playbackStateSubscription;
+  StreamSubscription? _mediaItemSubscription;
+  StreamSubscription? _queueSubscription;
 
   @override
   PlayerState build() {
-    _listenToPlayerChanges();
+    _listenToAudioService();
 
     ref.onDispose(() {
-      _playerStateSubscription?.cancel();
-      _positionSubscription?.cancel();
-      _sequenceSubscription?.cancel();
-      _durationSubscription?.cancel();
-      _audioPlayer.dispose();
+      _playbackStateSubscription?.cancel();
+      _mediaItemSubscription?.cancel();
+      _queueSubscription?.cancel();
     });
 
     return const PlayerState();
   }
 
-  void _listenToPlayerChanges() {
-    _playerStateSubscription =
-        _audioPlayer.playerStateStream.listen((playerState) {
-          state = state.copyWith(isPlaying: playerState.playing);
-        });
+  void _listenToAudioService() {
+    _playbackStateSubscription = audioHandler.playbackState.listen((playbackState) {
 
-    _positionSubscription = _audioPlayer.positionStream.listen((position) {
-      state = state.copyWith(position: position);
+      final playbackMode = _mapToPlaybackMode(playbackState.repeatMode, playbackState.shuffleMode);
+
+      state = state.copyWith(
+        isPlaying: playbackState.playing,
+        position: playbackState.updatePosition,
+        duration: audioHandler.mediaItem.value?.duration ?? Duration.zero,
+        playbackMode: playbackMode,
+      );
     });
 
-    _durationSubscription = _audioPlayer.durationStream.listen((duration) {
-      state = state.copyWith(duration: duration ?? Duration.zero);
+    _mediaItemSubscription = audioHandler.mediaItem.listen((mediaItem) {
+      final track = mediaItem == null ? null : _mediaItemToTrack(mediaItem);
+      // Solo actualizamos si el ID es diferente, para evitar reconstrucciones innecesarias
+      // que podrían interferir con la actualización optimista.
+      if (state.currentTrack?.id != track?.id) {
+        state = state.copyWith(
+          currentTrack: track,
+          clearCurrentTrack: track == null,
+          duration: mediaItem?.duration ?? Duration.zero,
+        );
+      }
     });
 
-    _sequenceSubscription =
-        _audioPlayer.sequenceStateStream.listen((sequenceState) {
-          if (sequenceState == null) return;
-          final currentItem = sequenceState.currentSource;
-          if (currentItem == null) {
-            state = state.copyWith(clearCurrentTrack: true);
-            return;
-          }
-
-          final track = _currentQueue.firstWhereOrNull(
-                  (t) => t.id.toString() == currentItem.tag as String);
-
-          state = state.copyWith(
-            currentTrack: track,
-            queue: _currentQueue,
-          );
-        });
+    _queueSubscription = audioHandler.queue.listen((queue) {
+      final trackQueue = queue.map(_mediaItemToTrack).toList();
+      state = state.copyWith(queue: trackQueue);
+    });
   }
 
-  Future<void> playTrack(Track track, {List<Track>? queue}) async {
-    _currentQueue = queue ?? [track];
-
-    final audioSources = _currentQueue.map((track) {
-      if (track.isLocal && track.filePath != null) {
-        return AudioSource.file(track.filePath!, tag: track.id.toString());
-      } else {
-        return AudioSource.uri(Uri.parse(track.preview),
-            tag: track.id.toString());
-      }
-    }).toList();
-
-    final playlist = ConcatenatingAudioSource(children: audioSources);
-    final initialIndex = _currentQueue
-        .indexWhere((t) => t.id == track.id && t.filePath == track.filePath);
-
-    try {
-      await _audioPlayer.setAudioSource(playlist,
-          initialIndex: initialIndex >= 0 ? initialIndex : 0);
-      state = state.copyWith(queue: _currentQueue);
-      resume();
-    } catch (e) {
-      //
+  PlaybackMode _mapToPlaybackMode(AudioServiceRepeatMode repeatMode, AudioServiceShuffleMode shuffleMode) {
+    if (shuffleMode == AudioServiceShuffleMode.all) {
+      return PlaybackMode.shuffle;
+    }
+    switch (repeatMode) {
+      case AudioServiceRepeatMode.none:
+        return PlaybackMode.normal;
+      case AudioServiceRepeatMode.one:
+        return PlaybackMode.loopOne;
+      case AudioServiceRepeatMode.all:
+      case AudioServiceRepeatMode.group:
+        return PlaybackMode.loopAll;
     }
   }
 
+  Track _mediaItemToTrack(MediaItem mediaItem) {
+    return Track(
+      id: int.tryParse(mediaItem.id) ?? 0,
+      title: mediaItem.title,
+      preview: mediaItem.extras!['url'],
+      artist: Artist(id: 0, name: mediaItem.artist ?? 'Desconocido', pictureMedium: ''),
+      albumId: 0,
+      albumTitle: mediaItem.album ?? 'Desconocido',
+      albumCover: mediaItem.extras!['albumCover'] ?? '',
+      duration: mediaItem.duration?.inSeconds ?? 0,
+      isLocal: mediaItem.extras!['isLocal'],
+      filePath: mediaItem.extras!['filePath'],
+    );
+  }
+
+  Future<void> playTrack(Track track, {List<Track>? queue}) async {
+    // Actualización optimista: actualiza la UI inmediatamente
+    state = state.copyWith(
+      currentTrack: track,
+      isPlaying: true,
+      queue: queue ?? [track],
+    );
+    // Luego, envía el comando al servicio de audio
+    await audioHandler.playTrack(track, newQueue: queue);
+  }
+
   Future<void> removeTrackFromQueue(Track track) async {
-    final index = _currentQueue
-        .indexWhere((t) => t.id == track.id && t.filePath == track.filePath);
-
-    if (index != -1) {
-      _currentQueue.removeAt(index);
-
-      final audioSource = _audioPlayer.audioSource;
-      if (audioSource is ConcatenatingAudioSource) {
-        await audioSource.removeAt(index);
-      }
-
-      state = state.copyWith(queue: List.from(_currentQueue));
+    final index = state.queue.indexWhere((t) => t.id == track.id && t.filePath == track.filePath);
+    if(index != -1){
+      await audioHandler.removeQueueItemAt(index);
     }
   }
 
   void playTrackFromQueue(Track track) {
-    final index = _currentQueue
-        .indexWhere((t) => t.id == track.id && t.filePath == track.filePath);
-    if (index != -1) {
-      _audioPlayer.seek(Duration.zero, index: index);
+    final index = state.queue.indexWhere((t) => t.id == track.id && t.filePath == track.filePath);
+    if(index != -1){
+      audioHandler.skipToQueueItem(index);
     }
   }
 
   void cyclePlaybackMode() {
-    final currentMode = state.playbackMode;
-    final nextMode = switch (currentMode) {
-      PlaybackMode.normal => PlaybackMode.loopAll,
-      PlaybackMode.loopAll => PlaybackMode.loopOne,
-      PlaybackMode.loopOne => PlaybackMode.shuffle,
-      PlaybackMode.shuffle => PlaybackMode.normal,
-    };
-
-    switch (nextMode) {
-      case PlaybackMode.normal:
-        _audioPlayer.setLoopMode(LoopMode.off);
-        _audioPlayer.setShuffleModeEnabled(false);
-        break;
-      case PlaybackMode.loopAll:
-        _audioPlayer.setLoopMode(LoopMode.all);
-        _audioPlayer.setShuffleModeEnabled(false);
-        break;
-      case PlaybackMode.loopOne:
-        _audioPlayer.setLoopMode(LoopMode.one);
-        _audioPlayer.setShuffleModeEnabled(false);
-        break;
-      case PlaybackMode.shuffle:
-        _audioPlayer.setLoopMode(LoopMode.all);
-        _audioPlayer.setShuffleModeEnabled(true);
-        break;
-    }
-    state = state.copyWith(playbackMode: nextMode);
+    audioHandler.cyclePlaybackMode();
   }
 
-  void resume() => _audioPlayer.play();
-  void pause() => _audioPlayer.pause();
-  void seek(Duration position) => _audioPlayer.seek(position);
-  void nextTrack() => _audioPlayer.seekToNext();
-  void previousTrack() => _audioPlayer.seekToPrevious();
+  void resume() => audioHandler.play();
+  void pause() => audioHandler.pause();
+  void seek(Duration position) => audioHandler.seek(position);
+  void nextTrack() => audioHandler.skipToNext();
+  void previousTrack() => audioHandler.skipToPrevious();
 }
