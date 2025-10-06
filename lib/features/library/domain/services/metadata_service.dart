@@ -12,4 +12,14 @@ class MetadataService {
       return [];
     }
   }
+
+  Future<bool> deleteLocalFile(String filePath) async {
+    try {
+      final bool? deleted = await _platform.invokeMethod('deleteLocalFile', {'filePath': filePath});
+      return deleted ?? false;
+    } on PlatformException catch (e) {
+      print("Failed to delete file: '${e.message}'.");
+      return false;
+    }
+  }
 }

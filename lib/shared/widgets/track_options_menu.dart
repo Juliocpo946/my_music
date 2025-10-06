@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_music/features/home/domain/entities/track.dart';
 import 'package:my_music/features/library/presentation/viewmodels/library_viewmodel.dart';
 import 'package:my_music/shared/widgets/add_to_playlist_dialog.dart';
 import 'package:my_music/shared/widgets/track_details_dialog.dart';
+import 'package:my_music/features/library/domain/services/metadata_service.dart';
 
 class TrackOptionsMenu extends ConsumerWidget {
   final Track track;
@@ -14,6 +14,7 @@ class TrackOptionsMenu extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final libraryNotifier = ref.read(libraryViewModelProvider.notifier);
     final isInLibraryFuture = libraryNotifier.isInLibrary(track.id);
+    final metadataService = MetadataService();
 
     return Wrap(
       children: <Widget>[
@@ -57,18 +58,35 @@ class TrackOptionsMenu extends ConsumerWidget {
                     ),
                     TextButton(
                       onPressed: () async {
+                        bool deleted = false;
                         try {
                           if (track.filePath != null) {
-                            final file = File(track.filePath!);
-                            if (await file.exists()) {
-                              await file.delete();
+                            deleted = await metadataService.deleteLocalFile(track.filePath!);
+                          }
+
+                          if (deleted) {
+                            libraryNotifier.removeTrackFromLibrary(track);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Archivo eliminado')),
+                              );
+                            }
+                          } else {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('No se pudo eliminar el archivo')),
+                              );
                             }
                           }
-                          libraryNotifier.removeTrackFromLibrary(track);
                         } catch (e) {
-                          //
+                          print("Error deleting file from Flutter: $e");
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Error al eliminar')),
+                            );
+                          }
                         }
-                        Navigator.pop(context);
+                        if (context.mounted) Navigator.pop(context);
                       },
                       child: const Text('Eliminar'),
                     ),
